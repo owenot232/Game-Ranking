@@ -10,27 +10,28 @@
         :root { 
             --bg: #0b0f1a; --card: #161e2e; --accent: #38bdf8; 
             --star: #fbbf24; --text: #f1f5f9; --ui: #1e293b; --danger: #ef4444; --backlog: #10b981;
+            --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32;
         }
         [data-theme="midnight"] { --bg: #000; --card: #111; --accent: #a855f7; --ui: #1f1f1f; }
         [data-theme="crimson"] { --bg: #1a0b0b; --card: #2e1616; --accent: #f87171; --ui: #3b1e1e; }
 
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 100px 20px; transition: background 0.3s; overflow-x: hidden; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 120px 20px; transition: background 0.3s; overflow-x: hidden; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.3rem; letter-spacing: 1px; }
-        .settings-icon { font-size: 1.4rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
+        .settings-icon { font-size: 1.3rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
+
+        /* FILTER BAR */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-select { background: var(--card); color: var(--text); border: 1px solid var(--ui); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; min-width: max-content; }
 
         /* TABS */
-        .tab-content { display: none; animation: fadeIn 0.2s ease-in; }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .nav-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); 
-            display: flex; justify-content: space-around; padding: 12px 0; 
-            border-top: 1px solid var(--ui); z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom));
-        }
-        .nav-item { color: #64748b; font-weight: 700; font-size: 0.75rem; text-align: center; cursor: pointer; flex: 1; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--ui); z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        .nav-item { color: #64748b; font-weight: 700; font-size: 0.75rem; text-align: center; flex: 1; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
 
@@ -40,29 +41,45 @@
             background: var(--card); margin-bottom: 12px; padding: 14px 16px; 
             border-radius: 18px; display: flex; align-items: center; 
             box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--ui);
+            transition: transform 0.2s;
         }
+
+        /* TOP 3 SPECIAL STYLES */
+        .rank-1 { border: 1px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .rank-1 .rank { color: var(--gold) !important; }
+        .rank-2 { border: 1px solid var(--silver) !important; }
+        .rank-2 .rank { color: var(--silver) !important; }
+        .rank-3 { border: 1px solid var(--bronze) !important; }
+        .rank-3 .rank { color: var(--bronze) !important; }
+
         .rank { font-weight: 900; font-size: 1.2rem; margin-right: 15px; color: var(--accent); min-width: 25px; text-align: center; }
         .game-info { flex-grow: 1; }
         .game-title { font-weight: 700; font-size: 1.05rem; display: block; }
-        .game-meta { font-size: 0.8rem; color: #64748b; margin-top: 2px; font-weight: 600; }
+        .game-meta { font-size: 0.75rem; color: #64748b; margin-top: 3px; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .tag { background: var(--ui); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; color: var(--accent); }
+
         .controls { display: flex; align-items: center; gap: 12px; margin-left: 10px; border-left: 1px solid var(--ui); padding-left: 15px; }
         .drag-handle { font-size: 1.5rem; color: #475569; padding: 5px; cursor: grab; }
-
-        /* STATS PAGE */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--ui); text-align: center; }
-        .stat-val { display: block; font-size: 1.8rem; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
-        .stat-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
         /* MODALS */
         .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
         .modal.active { display: flex; }
-        .big-rating { font-size: 4rem; font-weight: 900; color: var(--star); text-align: center; margin: 10px 0; font-variant-numeric: tabular-nums; }
+        .big-rating { font-size: 4rem; font-weight: 900; color: var(--star); text-align: center; margin: 5px 0; font-variant-numeric: tabular-nums; }
 
-        input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
-        button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; cursor: pointer; }
-        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; cursor: pointer; }
-        .finish-btn { background: var(--backlog) !important; color: white !important; }
+        .form-group { margin-top: 15px; }
+        .form-label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
+
+        input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .row { display: flex; gap: 10px; }
+        
+        button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
+        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid var(--ui); text-align: center; }
+        .stat-val { display: block; font-size: 1.5rem; font-weight: 900; color: var(--accent); }
+        .stat-label { font-size: 0.6rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
     </style>
 </head>
 <body data-theme="default">
@@ -70,6 +87,26 @@
     <div class="header">
         <h1 id="page-title">RANKINGS</h1>
         <div class="settings-icon" onclick="openSettings()">⚙️</div>
+    </div>
+
+    <div id="filter-container" class="filter-bar">
+        <select class="filter-select" id="sort-type" onchange="render()">
+            <option value="manual">Sort: Manual Rank</option>
+            <option value="high">Sort: Highest Rating</option>
+            <option value="low">Sort: Lowest Rating</option>
+            <option value="hours">Sort: Most Played</option>
+            <option value="newest">Sort: Newest Added</option>
+        </select>
+        <select class="filter-select" id="filter-genre" onchange="render()">
+            <option value="all">Genre: All</option>
+            <option value="Action">Action</option>
+            <option value="RPG">RPG</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Shooter">Shooter</option>
+            <option value="Open World">Open World</option>
+            <option value="Horror">Horror</option>
+            <option value="Indie">Indie</option>
+        </select>
     </div>
 
     <div id="tab-ranked" class="tab-content active">
@@ -83,15 +120,7 @@
     </div>
 
     <div id="tab-stats" class="tab-content">
-        <div class="stats-grid">
-            <div class="stat-card"><span class="stat-val" id="stat-total">0</span><span class="stat-label">Ranked</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-avg">0.0</span><span class="stat-label">Avg Rating</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-hours">0</span><span class="stat-label">Total Hours</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-top">0</span><span class="stat-label">9.0+ Scores</span></div>
-            <div class="stat-card" style="grid-column: span 2;">
-                <span class="stat-val" id="stat-rate">0%</span><span class="stat-label">Completion Rate (Ranked vs Backlog)</span>
-            </div>
-        </div>
+        <div class="stats-grid" id="stats-area"></div>
     </div>
 
     <nav class="nav-bar">
@@ -102,14 +131,46 @@
 
     <div id="modal-review" class="modal">
         <h2 id="m-title" style="text-align:center; margin:0; color:var(--accent);">Title</h2>
+        
         <div id="rating-section">
             <div id="m-rating-num" class="big-rating">0.0</div>
             <input type="range" id="m-slider" min="0" max="10" step="0.1" value="0" oninput="document.getElementById('m-rating-num').innerText = parseFloat(this.value).toFixed(1)">
-            <input type="number" id="m-hours" placeholder="Total hours played...">
+            
+            <div class="row">
+                <div class="form-group" style="flex:1">
+                    <label class="form-label">Genre</label>
+                    <select id="m-genre">
+                        <option value="Action">Action</option><option value="RPG">RPG</option><option value="Adventure">Adventure</option>
+                        <option value="Shooter">Shooter</option><option value="Open World">Open World</option><option value="Horror">Horror</option>
+                        <option value="Indie">Indie</option><option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label class="form-label">Hours</label>
+                    <input type="number" id="m-hours" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Date Completed</label>
+                <div class="row">
+                    <select id="m-month">
+                        <option value="">Month</option><option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
+                        <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option><option value="Jul">Jul</option>
+                        <option value="Aug">Aug</option><option value="Sep">Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
+                    </select>
+                    <input type="number" id="m-year" placeholder="Year (2026)">
+                </div>
+            </div>
         </div>
-        <textarea id="m-text" placeholder="Review or backlog notes..."></textarea>
+
+        <div class="form-group">
+            <label class="form-label">Your Review / Notes</label>
+            <textarea id="m-text" placeholder="Journal your thoughts..."></textarea>
+        </div>
+
         <button class="primary" onclick="saveGame()">Save Changes</button>
-        <button id="m-upgrade" class="primary finish-btn" style="display:none;" onclick="moveBacklogToRanked()">Mark as Finished 🏆</button>
+        <button id="m-upgrade" class="primary" style="background:var(--backlog); color:white; display:none;" onclick="moveBacklogToRanked()">Mark as Finished 🏆</button>
         <button class="secondary" style="color:var(--danger);" onclick="deleteGame()">Delete Game</button>
         <button class="secondary" onclick="closeModals()">Cancel</button>
     </div>
@@ -121,8 +182,8 @@
             <option value="midnight">Midnight Purple</option>
             <option value="crimson">Crimson Red</option>
         </select>
-        <button class="primary" onclick="exportData()">💾 Backup Data (.json)</button>
-        <button class="secondary" onclick="document.getElementById('imp').click()">📂 Restore Data</button>
+        <button class="primary" onclick="exportData()">💾 Backup JSON</button>
+        <button class="secondary" onclick="document.getElementById('imp').click()">📂 Restore JSON</button>
         <input type="file" id="imp" style="display:none" onchange="importData(event)">
         <div style="flex-grow:1"></div>
         <button class="primary" onclick="closeModals()">Done</button>
@@ -142,33 +203,61 @@
             document.getElementById('tab-' + t).classList.add('active');
             el.classList.add('active');
             document.getElementById('page-title').innerText = t.toUpperCase();
+            document.getElementById('filter-container').style.display = (t === 'ranked') ? 'flex' : 'none';
             if(t === 'stats') updateStats();
-        }
-
-        function updateStats() {
-            const total = ranked.length;
-            const avg = total ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / total).toFixed(1) : "0.0";
-            const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
-            const masterpieces = ranked.filter(g => parseFloat(g.rating) >= 9).length;
-            const rate = (total + backlog.length) ? Math.round((total / (total + backlog.length)) * 100) : 0;
-
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-avg').innerText = avg;
-            document.getElementById('stat-hours').innerText = hrs.toLocaleString();
-            document.getElementById('stat-top').innerText = masterpieces;
-            document.getElementById('stat-rate').innerText = rate + "%";
+            render();
         }
 
         function render() {
+            const sort = document.getElementById('sort-type').value;
+            const genreFilter = document.getElementById('filter-genre').value;
+            
+            let displayRanked = [...ranked];
+            if(genreFilter !== 'all') displayRanked = displayRanked.filter(g => g.genre === genreFilter);
+
+            if(sort === 'high') displayRanked.sort((a,b) => b.rating - a.rating);
+            else if(sort === 'low') displayRanked.sort((a,b) => a.rating - b.rating);
+            else if(sort === 'hours') displayRanked.sort((a,b) => b.hours - a.hours);
+            else if(sort === 'newest') displayRanked.sort((a,b) => b.id - a.id);
+
             const rList = document.getElementById('list-ranked');
+            rList.innerHTML = '';
+            displayRanked.forEach((g, i) => {
+                const isTop3 = sort === 'manual' && genreFilter === 'all';
+                const podiumClass = isTop3 && i < 3 ? `rank-${i+1}` : '';
+                const trophy = (isTop3 && i === 0) ? '🏆 ' : (isTop3 && i === 1) ? '🥈 ' : (isTop3 && i === 2) ? '🥉 ' : '';
+                const dateText = g.month ? ` • ${g.month} ${g.year}` : '';
+
+                rList.innerHTML += `
+                <li class="game-item ${podiumClass}" data-id="${g.id}">
+                    <div class="rank">${i+1}</div>
+                    <div class="game-info" onclick="openReview('${g.id}', true)">
+                        <span class="game-title">${trophy}${g.title}</span>
+                        <div class="game-meta">
+                            <span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span>
+                            <span>${g.hours || 0}h</span>
+                            <span class="tag">${g.genre || 'Misc'}</span>
+                            <span style="font-size:0.6rem; opacity:0.6">${dateText}</span>
+                        </div>
+                    </div>
+                    <div class="controls"><div class="drag-handle">≡</div></div>
+                </li>`;
+            });
+
             const bList = document.getElementById('list-backlog');
-            rList.innerHTML = ''; bList.innerHTML = '';
-            ranked.forEach((g, i) => {
-                rList.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', true)"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
-            });
+            bList.innerHTML = '';
             backlog.forEach((g, i) => {
-                bList.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', false)"><span class="game-title">${g.title}</span><div class="game-meta">Notes written ✓</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
+                bList.innerHTML += `
+                <li class="game-item" data-id="${g.id}">
+                    <div class="rank">${i+1}</div>
+                    <div class="game-info" onclick="openReview('${g.id}', false)">
+                        <span class="game-title">${g.title}</span>
+                        <div class="game-meta">Plan to play...</div>
+                    </div>
+                    <div class="controls"><div class="drag-handle">≡</div></div>
+                </li>`;
             });
+
             localStorage.setItem('myGames', JSON.stringify(ranked));
             localStorage.setItem('myBacklog', JSON.stringify(backlog));
         }
@@ -184,6 +273,9 @@
                 document.getElementById('m-slider').value = g.rating || 0;
                 document.getElementById('m-rating-num').innerText = parseFloat(g.rating || 0).toFixed(1);
                 document.getElementById('m-hours').value = g.hours || "";
+                document.getElementById('m-genre').value = g.genre || "Action";
+                document.getElementById('m-month').value = g.month || "";
+                document.getElementById('m-year').value = g.year || "";
             }
             document.getElementById('modal-review').classList.add('active');
         }
@@ -191,51 +283,52 @@
         function saveGame() {
             const g = (isEditingRanked ? ranked : backlog).find(x => x.id === editId);
             g.review = document.getElementById('m-text').value;
-            if(isEditingRanked) { g.rating = document.getElementById('m-slider').value; g.hours = document.getElementById('m-hours').value; }
+            if(isEditingRanked) {
+                g.rating = document.getElementById('m-slider').value;
+                g.hours = document.getElementById('m-hours').value;
+                g.genre = document.getElementById('m-genre').value;
+                g.month = document.getElementById('m-month').value;
+                g.year = document.getElementById('m-year').value;
+            }
             closeModals(); render();
         }
 
         function moveBacklogToRanked() {
             const idx = backlog.findIndex(x => x.id === editId);
             const g = backlog.splice(idx, 1)[0];
-            g.rating = 0; g.hours = "";
+            g.rating = 0; g.genre = "Action";
             ranked.push(g); closeModals(); render(); openReview(g.id, true);
         }
 
         function addNew(type) {
             const t = prompt("Game Title:"); if(!t) return;
-            const newG = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "" };
+            const newG = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "", genre: "Action" };
             if(type === 'ranked') ranked.push(newG); else backlog.push(newG);
             render();
         }
 
-        function deleteGame() {
-            if(!confirm("Delete this game?")) return;
-            if(isEditingRanked) ranked = ranked.filter(x => x.id !== editId);
-            else backlog = backlog.filter(x => x.id !== editId);
-            closeModals(); render();
-        }
-
+        function deleteGame() { if(confirm("Delete game?")) { if(isEditingRanked) ranked = ranked.filter(x => x.id !== editId); else backlog = backlog.filter(x => x.id !== editId); closeModals(); render(); } }
         function openSettings() { document.getElementById('modal-settings').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-
-        function exportData() {
-            const blob = new Blob([JSON.stringify({r: ranked, b: backlog})], {type:'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-            a.download = 'GameJournal_Backup.json'; a.click();
+        function updateStats() {
+            const total = ranked.length;
+            const avg = total ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / total).toFixed(1) : "0.0";
+            const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
+            const top = ranked.filter(g => g.rating >= 9).length;
+            document.getElementById('stats-area').innerHTML = `
+                <div class="stat-card"><span class="stat-val">${total}</span><span class="stat-label">Ranked</span></div>
+                <div class="stat-card"><span class="stat-val">${avg}</span><span class="stat-label">Avg Rating</span></div>
+                <div class="stat-card"><span class="stat-val">${hrs}h</span><span class="stat-label">Total Time</span></div>
+                <div class="stat-card"><span class="stat-val">${top}</span><span class="stat-label">Masterpieces</span></div>
+            `;
         }
 
-        function importData(e) {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                const d = JSON.parse(f.target.result);
-                ranked = d.r || []; backlog = d.b || [];
-                render();
-            };
-            reader.readAsText(e.target.files[0]);
-        }
+        function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({r: ranked, b: backlog})], {type:'application/json'})); a.download = 'GameJournal_Final.json'; a.click(); }
+        function importData(e) { const r = new FileReader(); r.onload = (f) => { const d = JSON.parse(f.target.result); ranked = d.r || []; backlog = d.b || []; render(); }; r.readAsText(e.target.files[0]); }
 
         new Sortable(document.getElementById('list-ranked'), { handle: '.drag-handle', animation: 200, onEnd: () => {
+            const sort = document.getElementById('sort-type').value;
+            if(sort !== 'manual') return render(); // Prevent saving sort as rank
             const order = Array.from(document.getElementById('list-ranked').children).map(li => li.getAttribute('data-id'));
             ranked = order.map(id => ranked.find(g => g.id === id));
             render();
