@@ -1,4 +1,4 @@
-const CACHE_NAME = 'game-ranker-v13';
+const CACHE_NAME = 'game-ranker-v14';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['index.html', 'manifest.json'])));
 });
