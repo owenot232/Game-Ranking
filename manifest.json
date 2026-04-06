@@ -1,15 +1,18 @@
 {
-  "name": "GameRanker",
-  "short_name": "Ranker",
+  "name": "The Gaming Lab",
+  "short_name": "GameLab",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#38bdf8",
+  "background_color": "#000000",
+  "theme_color": "#a855f7",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/686/686589.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
-}
+  ],
+  "orientation": "portrait",
+  "prefer_related_applications": false
+  }
