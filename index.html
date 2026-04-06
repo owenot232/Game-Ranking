@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Gaming Lab</title>
+    <title>The Gaming Lab Pro</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -41,10 +41,9 @@
         .tag { background: var(--ui); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: var(--accent); }
         .drag-handle { font-size: 1.4rem; color: #475569; padding: 5px; cursor: grab; margin-left: 10px; }
 
-        /* THE LAB (PLAYING TAB) */
-        .lab-card { background: linear-gradient(145deg, var(--card), var(--ui)); padding: 20px; border-radius: 24px; border: 1px solid var(--playing); margin-bottom: 20px; position: relative; }
-        .lab-title { font-size: 1.4rem; font-weight: 900; color: var(--playing); margin-bottom: 10px; display: block; }
-        .comparison-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: center; border: 1px dashed var(--accent); }
+        /* THE LAB */
+        .lab-card { background: linear-gradient(145deg, var(--card), var(--ui)); padding: 20px; border-radius: 24px; border: 1px solid var(--playing); margin-bottom: 20px; }
+        .comparison-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: center; border: 1px dashed var(--accent); font-size: 0.85rem; }
 
         /* STATS */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -52,12 +51,17 @@
         .stat-val { display: block; font-size: 1.6rem; font-weight: 900; color: var(--accent); }
         .stat-label { font-size: 0.6rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
 
+        /* CRITIC SLIDERS */
+        .critic-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .critic-label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; width: 70px; text-transform: uppercase; }
+        .critic-slider { flex: 1; height: 6px !important; }
+        .critic-val { font-size: 0.9rem; font-weight: 900; color: var(--star); width: 30px; text-align: right; }
+
         /* MODALS */
         .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
         .modal.active { display: flex; }
-        input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
+        input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; font-size: 16px; box-sizing: border-box; }
         button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
-        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
     </style>
 </head>
 <body data-theme="default">
@@ -78,38 +82,44 @@
     </div>
 
     <div id="tab-playing" class="tab-content">
-        <div id="active-lab-content">
-            </div>
+        <div id="active-lab-content"></div>
         <button class="primary" style="background:var(--playing); color:white;" onclick="addNew('playing')">+ Start New Game</button>
-        <div id="other-playing-list" style="margin-top:20px"></div>
     </div>
 
     <div id="tab-stats" class="tab-content">
         <div class="stats-grid" id="stats-area"></div>
-        <div id="persona-box" class="stat-card" style="margin-top:12px; width:100%; box-sizing:border-box;">
-            <span class="stat-label">Gaming Persona</span>
-            <span class="stat-val" id="persona-val" style="font-size:1.2rem; margin-top:5px;">Novice</span>
+        
+        <div class="stat-card" style="margin-top:12px; width:100%; box-sizing:border-box;">
+            <span class="stat-label">Top Genre Leaderboard</span>
+            <div id="genre-stats" style="margin-top:10px; text-align:left; font-size:0.8rem;"></div>
         </div>
-    </div>
 
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('ranked', this)"><span class="nav-icon">🏆</span>Ranked</div>
-        <div class="nav-item" onclick="switchTab('backlog', this)"><span class="nav-icon">⏳</span>Backlog</div>
-        <div class="nav-item" onclick="switchTab('playing', this)"><span class="nav-icon">🎮</span>Playing</div>
-        <div class="nav-item" onclick="switchTab('stats', this)"><span class="nav-icon">📊</span>Stats</div>
-    </nav>
+        <button class="primary" style="background:#4ade80; color:#000;" onclick="copyShareCard()">📋 Copy Player Profile</button>
+    </div>
 
     <div id="modal-review" class="modal">
         <h2 id="m-title" style="text-align:center; margin:0; color:var(--accent);">Title</h2>
+        
         <div id="rating-ui">
             <div id="m-rating-num" style="font-size:3rem; font-weight:900; text-align:center; color:var(--star);">0.0</div>
-            <input type="range" id="m-slider" min="0" max="10" step="0.1" value="0" oninput="document.getElementById('m-rating-num').innerText = parseFloat(this.value).toFixed(1)">
-            <input type="number" id="m-hours" placeholder="Hours played...">
-            <select id="m-genre">
-                <option value="Action">Action</option><option value="RPG">RPG</option><option value="Open World">Open World</option><option value="Shooter">Shooter</option><option value="Horror">Horror</option><option value="Indie">Indie</option>
-            </select>
+            
+            <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:15px; margin:10px 0;">
+                <div class="critic-row"><span class="critic-label">Gameplay</span><input type="range" class="critic-slider" id="c-game" min="0" max="10" step="0.1" oninput="calcAvg()"><span class="critic-val" id="v-game">0</span></div>
+                <div class="critic-row"><span class="critic-label">Story</span><input type="range" class="critic-slider" id="c-story" min="0" max="10" step="0.1" oninput="calcAvg()"><span class="critic-val" id="v-story">0</span></div>
+                <div class="critic-row"><span class="critic-label">Visuals</span><input type="range" class="critic-slider" id="c-visuals" min="0" max="10" step="0.1" oninput="calcAvg()"><span class="critic-val" id="v-visuals">0</span></div>
+                <div class="critic-row"><span class="critic-label">Music</span><input type="range" class="critic-slider" id="c-music" min="0" max="10" step="0.1" oninput="calcAvg()"><span class="critic-val" id="v-music">0</span></div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="m-hours" placeholder="Hours...">
+                <select id="m-genre">
+                    <option value="Action">Action</option><option value="RPG">RPG</option><option value="Open World">Open World</option><option value="Shooter">Shooter</option><option value="Horror">Horror</option><option value="Indie">Indie</option>
+                </select>
+            </div>
         </div>
-        <textarea id="m-text" placeholder="Your thoughts..."></textarea>
+
+        <textarea id="m-text" placeholder="Journal your thoughts..."></textarea>
+        
         <button class="primary" onclick="saveGame()">Save Changes</button>
         <button id="m-finish" class="primary" style="background:var(--backlog); color:white; display:none;" onclick="moveToRanked()">Mark as Finished 🏆</button>
         <button class="secondary" style="color:var(--danger);" onclick="deleteGame()">Delete</button>
@@ -118,11 +128,9 @@
 
     <div id="modal-settings" class="modal">
         <h2>Settings</h2>
-        <select onchange="setTheme(this.value)" id="theme-sel"><option value="default">Classic</option><option value="midnight">Midnight</option><option value="crimson">Crimson</option></select>
         <button class="primary" onclick="exportData()">💾 Backup</button>
         <button class="secondary" onclick="document.getElementById('imp').click()">📂 Restore</button>
         <input type="file" id="imp" style="display:none" onchange="importData(event)">
-        <div style="flex-grow:1"></div>
         <button class="primary" onclick="closeModals()">Done</button>
     </div>
 
@@ -146,11 +154,26 @@
             render();
         }
 
+        function calcAvg() {
+            const g = parseFloat(document.getElementById('c-game').value);
+            const s = parseFloat(document.getElementById('c-story').value);
+            const v = parseFloat(document.getElementById('c-visuals').value);
+            const m = parseFloat(document.getElementById('c-music').value);
+            
+            document.getElementById('v-game').innerText = g.toFixed(1);
+            document.getElementById('v-story').innerText = s.toFixed(1);
+            document.getElementById('v-visuals').innerText = v.toFixed(1);
+            document.getElementById('v-music').innerText = m.toFixed(1);
+
+            const avg = (g + s + v + m) / 4;
+            document.getElementById('m-rating-num').innerText = avg.toFixed(1);
+        }
+
         function render() {
             const rL = document.getElementById('list-ranked');
             rL.innerHTML = '';
             ranked.forEach((g, i) => {
-                rL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'ranked')"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h <span class="tag">${g.genre}</span></div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
+                rL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'ranked')"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating || 0).toFixed(1)}</span> • ${g.hours || 0}h <span class="tag">${g.genre}</span></div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
             const bL = document.getElementById('list-backlog');
@@ -166,22 +189,31 @@
 
         function renderPlaying() {
             const lab = document.getElementById('active-lab-content');
-            if(playing.length === 0) { lab.innerHTML = `<p style="text-align:center; color:#64748b;">No active games. Move one from backlog or add new.</p>`; return; }
-            
+            if(playing.length === 0) { lab.innerHTML = `<p style="text-align:center; color:#64748b;">No games in 'The Lab'.</p>`; return; }
             const g = playing[0];
-            const randomComparison = ranked.length > 0 ? ranked[Math.floor(Math.random() * Math.min(ranked.length, 10))] : null;
-            const comparisonHTML = randomComparison ? `<div class="comparison-box"><p style="font-size:0.8rem; margin:0">RANKING CHECK:</p><p style="font-weight:800; margin:5px 0;">Is this better than ${randomComparison.title} (★${randomComparison.rating})?</p></div>` : '';
+            
+            // Lab Comparisons
+            let comparison = "";
+            if(ranked.length >= 5) {
+                const top1 = ranked[0];
+                const top5 = ranked[4];
+                comparison = `
+                    <div class="comparison-box">
+                        <p style="margin:0 0 10px 0; font-weight:bold; color:var(--accent);">THE LAB: FINAL RANK PREDICTOR</p>
+                        <div style="display:flex; justify-content:space-around; font-size:0.75rem;">
+                            <div>Is it better than<br><b>#1 ${top1.title}</b>?</div>
+                            <div style="border-left:1px solid #334155;"></div>
+                            <div>Is it better than<br><b>#5 ${top5.title}</b>?</div>
+                        </div>
+                    </div>
+                `;
+            }
 
             lab.innerHTML = `
                 <div class="lab-card" onclick="openReview('${g.id}', 'playing')">
-                    <span style="font-size:0.7rem; font-weight:800; color:var(--playing); text-transform:uppercase;">Current Session</span>
-                    <span class="lab-title">${g.title}</span>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>Predicted Score: <b style="color:var(--star)">★${parseFloat(g.rating).toFixed(1)}</b></span>
-                        <span class="tag" style="background:var(--playing); color:white;">LIVE</span>
-                    </div>
-                    ${comparisonHTML}
-                    <p style="font-size:0.8rem; color:#94a3b8; margin-top:15px; border-top:1px solid #334155; padding-top:10px;">${g.review || "Tap to add live notes..."}</p>
+                    <span style="font-size:1.4rem; font-weight:900; color:var(--playing); display:block;">${g.title}</span>
+                    <span style="font-size:1.2rem; color:var(--star); font-weight:900;">Predicted: ★${parseFloat(g.rating || 0).toFixed(1)}</span>
+                    ${comparison}
                 </div>
             `;
         }
@@ -195,11 +227,14 @@
             document.getElementById('rating-ui').style.display = src === 'backlog' ? 'none' : 'block';
             document.getElementById('m-finish').style.display = src === 'ranked' ? 'none' : 'block';
             
-            document.getElementById('m-slider').value = g.rating || 0;
-            document.getElementById('m-rating-num').innerText = parseFloat(g.rating || 0).toFixed(1);
+            document.getElementById('c-game').value = g.scores?.game || 0;
+            document.getElementById('c-story').value = g.scores?.story || 0;
+            document.getElementById('c-visuals').value = g.scores?.visuals || 0;
+            document.getElementById('c-music').value = g.scores?.music || 0;
+            calcAvg();
+
             document.getElementById('m-hours').value = g.hours || "";
             document.getElementById('m-genre').value = g.genre || "Action";
-            
             document.getElementById('modal-review').classList.add('active');
         }
 
@@ -207,9 +242,15 @@
             const list = editSource === 'ranked' ? ranked : (editSource === 'backlog' ? backlog : playing);
             const g = list.find(x => x.id === editId);
             g.review = document.getElementById('m-text').value;
-            g.rating = document.getElementById('m-slider').value;
             g.hours = document.getElementById('m-hours').value;
             g.genre = document.getElementById('m-genre').value;
+            g.scores = {
+                game: document.getElementById('c-game').value,
+                story: document.getElementById('c-story').value,
+                visuals: document.getElementById('c-visuals').value,
+                music: document.getElementById('c-music').value
+            };
+            g.rating = document.getElementById('m-rating-num').innerText;
             closeModals(); render(); renderPlaying();
         }
 
@@ -224,7 +265,7 @@
 
         function addNew(type) {
             const t = prompt("Game Title:"); if(!t) return;
-            const newG = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "", genre: "Action" };
+            const newG = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "", genre: "Action", scores: {game:0, story:0, visuals:0, music:0} };
             if(type === 'ranked') ranked.push(newG); 
             else if(type === 'backlog') backlog.push(newG);
             else playing.unshift(newG);
@@ -243,25 +284,37 @@
             const total = ranked.length;
             const avg = total ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / total).toFixed(1) : "0.0";
             const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
-            const tops = ranked.filter(g => g.rating >= 9).length;
+            const goats = ranked.filter(g => g.rating >= 9).length;
             
             document.getElementById('stats-area').innerHTML = `
                 <div class="stat-card"><span class="stat-val">${total}</span><span class="stat-label">Ranked</span></div>
-                <div class="stat-card"><span class="stat-val">${avg}</span><span class="stat-label">Avg Rating</span></div>
+                <div class="stat-card"><span class="stat-val">${avg}</span><span class="stat-label">Avg Score</span></div>
                 <div class="stat-card"><span class="stat-val">${hrs}h</span><span class="stat-label">Playtime</span></div>
-                <div class="stat-card"><span class="stat-val">${tops}</span><span class="stat-label">Goats</span></div>
+                <div class="stat-card"><span class="stat-val">${goats}</span><span class="stat-label">Goats (9+)</span></div>
             `;
 
-            // Persona Logic
-            const genres = ranked.map(g => g.genre);
-            const mostCommon = genres.sort((a,b) => genres.filter(v => v===a).length - genres.filter(v => v===b).length).pop();
-            const persona = total > 10 ? (mostCommon + " Master") : (total > 5 ? "Rising Critic" : "Casual Player");
-            document.getElementById('persona-val').innerText = persona;
+            // Genre Breakdown
+            const genreMap = {};
+            ranked.forEach(g => genreMap[g.genre] = (genreMap[g.genre] || 0) + 1);
+            const genreHTML = Object.entries(genreMap)
+                .sort((a,b) => b[1] - a[1])
+                .map(([name, count]) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${name}</span><span style="color:var(--accent)">${count} games</span></div>`)
+                .join('');
+            document.getElementById('genre-stats').innerHTML = genreHTML || "Add some ranked games!";
+        }
+
+        function copyShareCard() {
+            let text = `🎮 OWEN'S GAMING JOURNAL\n\n`;
+            text += `🏆 TOP 5 GAMES:\n`;
+            ranked.slice(0, 5).forEach((g, i) => text += `${i+1}. ${g.title} (${parseFloat(g.rating).toFixed(1)})\n`);
+            text += `\n📊 STATS:\n- Games Ranked: ${ranked.length}\n- Average Rating: ${ (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / ranked.length).toFixed(1) }\n- Total Time: ${ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0)}h\n\nBuild your own Hall of Fame!`;
+            navigator.clipboard.writeText(text);
+            alert("Profile copied to clipboard! Paste it in Discord or a text.");
         }
 
         function openSettings() { document.getElementById('modal-settings').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-        function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({r: ranked, b: backlog, p: playing})], {type:'application/json'})); a.download = 'GameLab_Backup.json'; a.click(); }
+        function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({r: ranked, b: backlog, p: playing})], {type:'application/json'})); a.download = 'GameJournal_Master.json'; a.click(); }
         function importData(e) { const r = new FileReader(); r.onload = (f) => { const d = JSON.parse(f.target.result); ranked = d.r || []; backlog = d.b || []; playing = d.p || []; render(); }; r.readAsText(e.target.files[0]); }
 
         new Sortable(document.getElementById('list-ranked'), { handle: '.drag-handle', animation: 200, onEnd: () => {
