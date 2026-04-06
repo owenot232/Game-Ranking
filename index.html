@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Journal Elite</title>
+    <title>Game Journal Ultimate</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -17,21 +17,22 @@
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 100px 20px; transition: background 0.3s; overflow-x: hidden; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.4rem; }
+        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.3rem; letter-spacing: 1px; }
         .settings-icon { font-size: 1.4rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
 
         /* TABS */
-        .tab-content { display: none; }
+        .tab-content { display: none; animation: fadeIn 0.2s ease-in; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .nav-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); 
             display: flex; justify-content: space-around; padding: 12px 0; 
             border-top: 1px solid var(--ui); z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
-        .nav-item { color: #64748b; font-weight: 700; font-size: 0.8rem; text-align: center; cursor: pointer; flex: 1; }
+        .nav-item { color: #64748b; font-weight: 700; font-size: 0.75rem; text-align: center; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+        .nav-icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
 
         /* LISTS */
         .game-list { list-style: none; padding: 0; margin: 0; }
@@ -47,6 +48,12 @@
         .controls { display: flex; align-items: center; gap: 12px; margin-left: 10px; border-left: 1px solid var(--ui); padding-left: 15px; }
         .drag-handle { font-size: 1.5rem; color: #475569; padding: 5px; cursor: grab; }
 
+        /* STATS PAGE */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--ui); text-align: center; }
+        .stat-val { display: block; font-size: 1.8rem; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+        .stat-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
         /* MODALS */
         .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
         .modal.active { display: flex; }
@@ -55,7 +62,6 @@
         input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
         button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; cursor: pointer; }
         button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; cursor: pointer; }
-        
         .finish-btn { background: var(--backlog) !important; color: white !important; }
     </style>
 </head>
@@ -76,26 +82,32 @@
         <ul id="list-backlog" class="game-list"></ul>
     </div>
 
+    <div id="tab-stats" class="tab-content">
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-val" id="stat-total">0</span><span class="stat-label">Ranked</span></div>
+            <div class="stat-card"><span class="stat-val" id="stat-avg">0.0</span><span class="stat-label">Avg Rating</span></div>
+            <div class="stat-card"><span class="stat-val" id="stat-hours">0</span><span class="stat-label">Total Hours</span></div>
+            <div class="stat-card"><span class="stat-val" id="stat-top">0</span><span class="stat-label">9.0+ Scores</span></div>
+            <div class="stat-card" style="grid-column: span 2;">
+                <span class="stat-val" id="stat-rate">0%</span><span class="stat-label">Completion Rate (Ranked vs Backlog)</span>
+            </div>
+        </div>
+    </div>
+
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('ranked', this)">
-            <span class="nav-icon">🏆</span>Ranked
-        </div>
-        <div class="nav-item" onclick="switchTab('backlog', this)">
-            <span class="nav-icon">⏳</span>Backlog
-        </div>
+        <div class="nav-item active" onclick="switchTab('ranked', this)"><span class="nav-icon">🏆</span>Ranked</div>
+        <div class="nav-item" onclick="switchTab('backlog', this)"><span class="nav-icon">⏳</span>Backlog</div>
+        <div class="nav-item" onclick="switchTab('stats', this)"><span class="nav-icon">📊</span>Stats</div>
     </nav>
 
     <div id="modal-review" class="modal">
         <h2 id="m-title" style="text-align:center; margin:0; color:var(--accent);">Title</h2>
-        
         <div id="rating-section">
             <div id="m-rating-num" class="big-rating">0.0</div>
             <input type="range" id="m-slider" min="0" max="10" step="0.1" value="0" oninput="document.getElementById('m-rating-num').innerText = parseFloat(this.value).toFixed(1)">
             <input type="number" id="m-hours" placeholder="Total hours played...">
         </div>
-
-        <textarea id="m-text" placeholder="Review or progress notes..."></textarea>
-        
+        <textarea id="m-text" placeholder="Review or backlog notes..."></textarea>
         <button class="primary" onclick="saveGame()">Save Changes</button>
         <button id="m-upgrade" class="primary finish-btn" style="display:none;" onclick="moveBacklogToRanked()">Mark as Finished 🏆</button>
         <button class="secondary" style="color:var(--danger);" onclick="deleteGame()">Delete Game</button>
@@ -119,13 +131,9 @@
     <script>
         let ranked = JSON.parse(localStorage.getItem('myGames')) || [];
         let backlog = JSON.parse(localStorage.getItem('myBacklog')) || [];
-        let editId = null;
-        let isEditingRanked = true;
+        let editId = null; let isEditingRanked = true;
 
-        function setTheme(t) {
-            document.body.setAttribute('data-theme', t);
-            localStorage.setItem('appTheme', t);
-        }
+        function setTheme(t) { document.body.setAttribute('data-theme', t); localStorage.setItem('appTheme', t); }
         setTheme(localStorage.getItem('appTheme') || 'default');
 
         function switchTab(t, el) {
@@ -134,37 +142,33 @@
             document.getElementById('tab-' + t).classList.add('active');
             el.classList.add('active');
             document.getElementById('page-title').innerText = t.toUpperCase();
+            if(t === 'stats') updateStats();
+        }
+
+        function updateStats() {
+            const total = ranked.length;
+            const avg = total ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / total).toFixed(1) : "0.0";
+            const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
+            const masterpieces = ranked.filter(g => parseFloat(g.rating) >= 9).length;
+            const rate = (total + backlog.length) ? Math.round((total / (total + backlog.length)) * 100) : 0;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-avg').innerText = avg;
+            document.getElementById('stat-hours').innerText = hrs.toLocaleString();
+            document.getElementById('stat-top').innerText = masterpieces;
+            document.getElementById('stat-rate').innerText = rate + "%";
         }
 
         function render() {
             const rList = document.getElementById('list-ranked');
             const bList = document.getElementById('list-backlog');
             rList.innerHTML = ''; bList.innerHTML = '';
-
             ranked.forEach((g, i) => {
-                rList.innerHTML += `
-                <li class="game-item" data-id="${g.id}">
-                    <div class="rank">${i+1}</div>
-                    <div class="game-info" onclick="openReview('${g.id}', true)">
-                        <span class="game-title">${g.title}</span>
-                        <div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h</div>
-                    </div>
-                    <div class="controls"><div class="drag-handle">≡</div></div>
-                </li>`;
+                rList.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', true)"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
-
             backlog.forEach((g, i) => {
-                bList.innerHTML += `
-                <li class="game-item" data-id="${g.id}">
-                    <div class="rank">${i+1}</div>
-                    <div class="game-info" onclick="openReview('${g.id}', false)">
-                        <span class="game-title">${g.title}</span>
-                        <div class="game-meta">Tap to edit notes...</div>
-                    </div>
-                    <div class="controls"><div class="drag-handle">≡</div></div>
-                </li>`;
+                bList.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', false)"><span class="game-title">${g.title}</span><div class="game-meta">Notes written ✓</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
-
             localStorage.setItem('myGames', JSON.stringify(ranked));
             localStorage.setItem('myBacklog', JSON.stringify(backlog));
         }
@@ -187,10 +191,7 @@
         function saveGame() {
             const g = (isEditingRanked ? ranked : backlog).find(x => x.id === editId);
             g.review = document.getElementById('m-text').value;
-            if(isEditingRanked) {
-                g.rating = document.getElementById('m-slider').value;
-                g.hours = document.getElementById('m-hours').value;
-            }
+            if(isEditingRanked) { g.rating = document.getElementById('m-slider').value; g.hours = document.getElementById('m-hours').value; }
             closeModals(); render();
         }
 
@@ -198,14 +199,11 @@
             const idx = backlog.findIndex(x => x.id === editId);
             const g = backlog.splice(idx, 1)[0];
             g.rating = 0; g.hours = "";
-            ranked.push(g);
-            closeModals(); render();
-            openReview(g.id, true);
+            ranked.push(g); closeModals(); render(); openReview(g.id, true);
         }
 
         function addNew(type) {
-            const t = prompt("Game Title:");
-            if(!t) return;
+            const t = prompt("Game Title:"); if(!t) return;
             const newG = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "" };
             if(type === 'ranked') ranked.push(newG); else backlog.push(newG);
             render();
