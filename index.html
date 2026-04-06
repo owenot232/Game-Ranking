@@ -7,117 +7,189 @@
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --bg: #0b0f1a; --card: #161e2e; --accent: #38bdf8; --star: #fbbf24; --text: #f1f5f9; --ui: #1e293b; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; overflow-x: hidden; }
-        h1 { text-align: center; color: var(--accent); margin-bottom: 5px; font-weight: 800; }
-        p.subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+        /* THEME VARIABLES */
+        :root { 
+            --bg: #0b0f1a; --card: #161e2e; --accent: #38bdf8; 
+            --star: #fbbf24; --text: #f1f5f9; --ui: #1e293b; --danger: #ef4444;
+        }
+
+        /* MIDNIGHT THEME */
+        [data-theme="midnight"] {
+            --bg: #000000; --card: #111111; --accent: #a855f7; 
+            --star: #eab308; --ui: #1f1f1f;
+        }
+
+        /* CRIMSON THEME */
+        [data-theme="crimson"] {
+            --bg: #1a0b0b; --card: #2e1616; --accent: #f87171; 
+            --star: #fbbf24; --ui: #3b1e1e;
+        }
+
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: background 0.3s; }
         
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.5rem; }
+        
+        .settings-icon { font-size: 1.5rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
+
         #game-list { list-style: none; padding: 0; margin: 0; }
         .game-item { 
             background: var(--card); margin-bottom: 12px; padding: 12px 16px; 
             border-radius: 18px; display: flex; align-items: center; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 1px solid #1e293b;
-            touch-action: pan-y; /* Crucial for smooth scrolling */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 1px solid var(--ui);
         }
         
         .rank { font-weight: 900; font-size: 1.3rem; margin-right: 15px; color: var(--accent); min-width: 30px; text-align: center; }
-        
-        /* The main tap area for reviews */
-        .game-info { flex-grow: 1; padding: 5px 0; }
-        .game-title { font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 2px; }
-        .rating-display { color: var(--star); font-size: 0.85rem; font-weight: 800; }
+        .game-info { flex-grow: 1; }
+        .game-title { font-weight: 700; font-size: 1.1rem; display: block; }
+        .game-meta { font-size: 0.8rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+        .rating-display { color: var(--star); }
 
-        /* The Control Zone on the right */
-        .controls { display: flex; align-items: center; gap: 15px; margin-left: 10px; border-left: 1px solid #2d3748; padding-left: 15px; }
-        
-        .drag-handle { 
-            font-size: 1.5rem; color: #475569; cursor: grab; padding: 10px 5px;
-            user-select: none; -webkit-user-select: none;
+        .controls { display: flex; align-items: center; gap: 15px; margin-left: 10px; border-left: 1px solid var(--ui); padding-left: 15px; }
+        .drag-handle { font-size: 1.5rem; color: #475569; cursor: grab; padding: 5px; }
+
+        /* FULLSCREEN MODALS */
+        .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 20px; z-index: 100; flex-direction: column; overflow-y: auto; }
+        .modal.active { display: flex; }
+
+        input, textarea, select { 
+            width: 100%; background: var(--ui); color: white; border: 1px solid #334155; 
+            border-radius: 12px; padding: 14px; margin-top: 10px; box-sizing: border-box; font-size: 16px; 
         }
         
-        .delete-btn { 
-            color: #ef4444; font-size: 1.2rem; font-weight: bold; background: none; border: none; padding: 10px 5px;
-        }
-
-        /* Modal styling */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); padding: 20px; align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid #334155; text-align: center; }
-        .big-rating { font-size: 4.5rem; font-weight: 900; color: var(--star); margin: 5px 0; font-variant-numeric: tabular-nums; }
+        button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
+        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
         
-        input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; margin: 25px 0; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 10px; background: #1e293b; border-radius: 10px; }
-        input[type=range]::-webkit-slider-thumb { height: 30px; width: 30px; border-radius: 50%; background: var(--accent); -webkit-appearance: none; margin-top: -10px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        /* SETTINGS SPECIFIC */
+        .settings-section { margin-bottom: 30px; }
+        .settings-label { display: block; margin-bottom: 10px; font-weight: bold; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .theme-btn { padding: 15px; border-radius: 12px; border: 2px solid transparent; font-weight: bold; font-size: 0.8rem; }
+        .theme-btn.active { border-color: var(--accent); }
 
-        textarea { width: 100%; height: 160px; background: #0b0f1a; color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 15px; box-sizing: border-box; font-size: 16px; outline: none; }
-        
-        button.action { border: none; padding: 16px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; }
-        .save-btn { background: var(--accent); color: #0b0f1a; margin-top: 20px; }
-        .add-btn { background: #10b981; color: white; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .close-btn { background: transparent; color: #64748b; margin-top: 10px; }
+        .big-rating { font-size: 4rem; font-weight: 900; color: var(--star); text-align: center; margin: 10px 0; }
+        .hours-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>Game Ranking</h1>
-    <p class="subtitle">Use ≡ to drag. Tap name to review.</p>
+    <div class="header-container">
+        <h1>MASTER RANKER</h1>
+        <div class="settings-icon" onclick="toggleModal('settings-modal')">⚙️</div>
+    </div>
     
-    <button class="action add-btn" onclick="addNewGame()">+ Add New Game</button>
+    <button class="primary" style="margin-bottom: 20px; margin-top: 0; background: #10b981; color: white;" onclick="addNewGame()">+ Add New Game</button>
     <ul id="game-list"></ul>
 
-    <div id="modal">
-        <div class="modal-content">
-            <h2 id="modal-title" style="margin:0; font-size: 1.1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Rating</h2>
-            <div id="rating-num" class="big-rating">0.0</div>
-            <input type="range" id="rating-slider" min="0" max="10" step="0.1" value="0" oninput="updateRatingLabel(this.value)">
-            <textarea id="review-text" placeholder="Add your thoughts..."></textarea>
-            <button class="action save-btn" onclick="saveReview()">Save Review</button>
-            <button class="action close-btn" onclick="closeModal()">Cancel</button>
+    <div id="review-modal" class="modal">
+        <h2 id="modal-title" style="color: var(--accent); text-align: center;">Game Review</h2>
+        <div id="rating-num" class="big-rating">0.0</div>
+        <input type="range" id="rating-slider" min="0" max="10" step="0.1" value="0" oninput="updateRatingLabel(this.value)">
+        
+        <div class="hours-row">
+            <span style="white-space: nowrap; font-weight: bold;">Hours:</span>
+            <input type="number" id="game-hours" placeholder="Total hours played..." style="margin-top: 0;">
         </div>
+
+        <textarea id="review-text" placeholder="What did you think?"></textarea>
+        
+        <button class="primary" onclick="saveReview()">Save Progress</button>
+        <button class="secondary" style="color: var(--danger);" onclick="deleteCurrentGame()">Delete Game</button>
+        <button class="secondary" onclick="toggleModal('review-modal')">Cancel</button>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <h2 style="color: var(--accent); margin-bottom: 30px;">Settings</h2>
+        
+        <div class="settings-section">
+            <span class="settings-label">Color Theme</span>
+            <div class="theme-grid">
+                <button class="theme-btn" style="background:#0b0f1a; color: #38bdf8;" onclick="setTheme('default')">Classic</button>
+                <button class="theme-btn" style="background:#000; color: #a855f7;" onclick="setTheme('midnight')">Midnight</button>
+                <button class="theme-btn" style="background:#1a0b0b; color: #f87171;" onclick="setTheme('crimson')">Crimson</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <span class="settings-label">Data Management</span>
+            <button class="primary" onclick="exportData()">💾 Export Backup (.json)</button>
+            <button class="secondary" onclick="document.getElementById('import-input').click()">📂 Import Backup</button>
+            <input type="file" id="import-input" style="display: none;" onchange="importData(event)">
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        <button class="primary" onclick="toggleModal('settings-modal')">Done</button>
     </div>
 
     <script>
         let games = JSON.parse(localStorage.getItem('myGames')) || [];
+        let currentTheme = localStorage.getItem('appTheme') || 'default';
         let currentEditingId = null;
 
-        const list = document.getElementById('game-list');
-        const modal = document.getElementById('modal');
+        document.documentElement.setAttribute('data-theme', currentTheme);
 
         function render() {
+            const list = document.getElementById('game-list');
             list.innerHTML = '';
             games.forEach((game, index) => {
                 const li = document.createElement('li');
                 li.className = 'game-item';
                 li.setAttribute('data-id', game.id);
-                
                 const score = parseFloat(game.rating || 0).toFixed(1);
+                const hours = game.hours ? ` • ${game.hours}h` : '';
                 
                 li.innerHTML = `
                     <div class="rank">${index + 1}</div>
                     <div class="game-info" onclick="openReview('${game.id}')">
                         <span class="game-title">${game.title}</span>
-                        <span class="rating-display">★ ${score}</span>
+                        <div class="game-meta"><span class="rating-display">★ ${score}</span>${hours}</div>
                     </div>
-                    <div class="controls">
-                        <button class="delete-btn" onclick="deleteGame('${game.id}', event)">×</button>
-                        <div class="drag-handle">≡</div>
-                    </div>
+                    <div class="controls"><div class="drag-handle">≡</div></div>
                 `;
                 list.appendChild(li);
             });
             localStorage.setItem('myGames', JSON.stringify(games));
         }
 
-        function updateRatingLabel(val) {
-            document.getElementById('rating-num').innerText = parseFloat(val).toFixed(1);
+        // NAVIGATION & THEME
+        function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
+        
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('appTheme', theme);
         }
 
-        // Initialize Sortable with a HANDLE
-        new Sortable(list, {
-            handle: '.drag-handle', // This restricts dragging ONLY to the pancake icon
-            animation: 250,
-            ghostClass: 'sortable-ghost',
+        // DATA ACTIONS
+        function exportData() {
+            const blob = new Blob([JSON.stringify(games)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Game-Rankings-Backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importData(event) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imported = JSON.parse(e.target.result);
+                if(confirm("This will replace your current list. Continue?")) {
+                    games = imported;
+                    render();
+                    alert("Imported successfully!");
+                }
+            };
+            reader.readAsText(event.target.files[0]);
+        }
+
+        // CORE LOGIC
+        function updateRatingLabel(val) { document.getElementById('rating-num').innerText = parseFloat(val).toFixed(1); }
+
+        new Sortable(document.getElementById('game-list'), {
+            handle: '.drag-handle', animation: 250,
             onEnd: function() {
-                const newOrder = Array.from(list.children).map(li => li.getAttribute('data-id'));
+                const newOrder = Array.from(document.getElementById('game-list').children).map(li => li.getAttribute('data-id'));
                 games = newOrder.map(id => games.find(g => g.id === id));
                 render();
             }
@@ -125,43 +197,35 @@
 
         function addNewGame() {
             const title = prompt("Game Title:");
-            if (title) {
-                games.push({ id: Date.now().toString(), title, review: "", rating: 0 });
-                render();
-            }
-        }
-
-        function deleteGame(id, event) {
-            event.stopPropagation();
-            if (confirm("Delete this entry?")) {
-                games = games.filter(g => g.id !== id);
-                render();
-            }
+            if (title) { games.push({ id: Date.now().toString(), title, review: "", rating: 0, hours: "" }); render(); }
         }
 
         function openReview(id) {
             currentEditingId = id;
             const game = games.find(g => g.id === id);
             document.getElementById('modal-title').innerText = game.title;
-            document.getElementById('review-text').value = game.review;
-            const rating = parseFloat(game.rating || 0).toFixed(1);
-            document.getElementById('rating-slider').value = rating;
-            document.getElementById('rating-num').innerText = rating;
-            modal.style.display = 'flex';
+            document.getElementById('review-text').value = game.review || "";
+            document.getElementById('game-hours').value = game.hours || "";
+            document.getElementById('rating-slider').value = game.rating || 0;
+            updateRatingLabel(game.rating || 0);
+            toggleModal('review-modal');
         }
 
         function saveReview() {
             const game = games.find(g => g.id === currentEditingId);
             game.review = document.getElementById('review-text').value;
+            game.hours = document.getElementById('game-hours').value;
             game.rating = document.getElementById('rating-slider').value;
-            closeModal();
+            toggleModal('review-modal');
             render();
         }
 
-        function closeModal() { modal.style.display = 'none'; }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        function deleteCurrentGame() {
+            if(confirm("Delete this game forever?")) {
+                games = games.filter(g => g.id !== currentEditingId);
+                toggleModal('review-modal');
+                render();
+            }
         }
 
         render();
