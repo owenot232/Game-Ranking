@@ -21,6 +21,10 @@
         h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; }
         .settings-icon { font-size: 1.2rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
 
+        /* SEARCH BAR */
+        .search-box { width: 100%; background: var(--card); border: 1px solid var(--ui); border-radius: 12px; padding: 10px 15px; color: white; font-size: 0.9rem; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.2s; }
+        .search-box:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+
         .filter-bar { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .filter-bar::-webkit-scrollbar { display: none; }
         .filter-select { background: var(--card); color: var(--text); border: 1px solid var(--ui); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; min-width: max-content; }
@@ -90,11 +94,13 @@
     </div>
 
     <div id="tab-ranked" class="tab-content active">
+        <input type="text" class="search-box" id="search-ranked" placeholder="Search rankings..." oninput="render()">
         <button class="primary" style="margin-bottom:20px; margin-top:0;" onclick="addNew('ranked')">+ New Ranked Game</button>
         <ul id="list-ranked" class="game-list"></ul>
     </div>
 
     <div id="tab-backlog" class="tab-content">
+        <input type="text" class="search-box" id="search-backlog" placeholder="Search backlog..." oninput="render()">
         <button class="primary" style="margin-bottom:20px; margin-top:0; background:var(--backlog); color:white;" onclick="addNew('backlog')">+ Add to Backlog</button>
         <ul id="list-backlog" class="game-list"></ul>
     </div>
@@ -180,22 +186,32 @@
         function render() {
             const sort = document.getElementById('sort-type').value;
             const genreFilter = document.getElementById('filter-genre-main').value;
+            const searchRanked = document.getElementById('search-ranked').value.toLowerCase();
+            const searchBacklog = document.getElementById('search-backlog').value.toLowerCase();
+
+            // Handle Ranked List
             let dR = [...ranked];
             if(genreFilter !== 'all') dR = dR.filter(g => g.genre === genreFilter);
+            if(searchRanked) dR = dR.filter(g => g.title.toLowerCase().includes(searchRanked));
+            
             if(sort === 'high') dR.sort((a,b) => b.rating - a.rating);
             else if(sort === 'low') dR.sort((a,b) => a.rating - b.rating);
             else if(sort === 'hours') dR.sort((a,b) => b.hours - a.hours);
 
             const rL = document.getElementById('list-ranked'); rL.innerHTML = '';
             dR.forEach((g, i) => {
-                const isP = sort === 'manual' && genreFilter === 'all';
+                const isP = sort === 'manual' && genreFilter === 'all' && !searchRanked;
                 const pC = isP && i < 3 ? `rank-${i+1}` : '';
                 const t = (isP && i === 0) ? '🏆 ' : (isP && i === 1) ? '🥈 ' : (isP && i === 2) ? '🥉 ' : '';
                 rL.innerHTML += `<li class="game-item ${pC}" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'ranked')"><span class="game-title">${t}${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h <span class="tag">${g.genre}</span><span style="opacity:0.5; font-size:0.6rem">${g.month||''} ${g.year||''}</span></div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
+            // Handle Backlog List
+            let dB = [...backlog];
+            if(searchBacklog) dB = dB.filter(g => g.title.toLowerCase().includes(searchBacklog));
+
             const bL = document.getElementById('list-backlog'); bL.innerHTML = '';
-            backlog.forEach((g, i) => {
+            dB.forEach((g, i) => {
                 bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">Plan to play...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
@@ -283,12 +299,14 @@
 
         new Sortable(document.getElementById('list-ranked'), { handle: '.drag-handle', animation: 200, onEnd: () => {
             if(document.getElementById('sort-type').value !== 'manual') return;
+            if(document.getElementById('search-ranked').value) return; // Disable reorder during search
             const order = Array.from(document.getElementById('list-ranked').children).map(li => li.getAttribute('data-id'));
             ranked = order.map(id => ranked.find(g => g.id === id));
             render();
         }});
 
         new Sortable(document.getElementById('list-backlog'), { handle: '.drag-handle', animation: 200, onEnd: () => {
+            if(document.getElementById('search-backlog').value) return; // Disable reorder during search
             const order = Array.from(document.getElementById('list-backlog').children).map(li => li.getAttribute('data-id'));
             backlog = order.map(id => backlog.find(g => g.id === id));
             render();
