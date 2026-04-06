@@ -3,232 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Ranker Elite</title>
+    <title>Game Journal Pro</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        /* THEME VARIABLES */
         :root { 
             --bg: #0b0f1a; --card: #161e2e; --accent: #38bdf8; 
-            --star: #fbbf24; --text: #f1f5f9; --ui: #1e293b; --danger: #ef4444;
+            --star: #fbbf24; --text: #f1f5f9; --ui: #1e293b; --danger: #ef4444; --backlog: #10b981;
         }
+        [data-theme="midnight"] { --bg: #000; --card: #111; --accent: #a855f7; --ui: #1f1f1f; }
+        [data-theme="crimson"] { --bg: #1a0b0b; --card: #2e1616; --accent: #f87171; --ui: #3b1e1e; }
 
-        /* MIDNIGHT THEME */
-        [data-theme="midnight"] {
-            --bg: #000000; --card: #111111; --accent: #a855f7; 
-            --star: #eab308; --ui: #1f1f1f;
-        }
-
-        /* CRIMSON THEME */
-        [data-theme="crimson"] {
-            --bg: #1a0b0b; --card: #2e1616; --accent: #f87171; 
-            --star: #fbbf24; --ui: #3b1e1e;
-        }
-
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: background 0.3s; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 100px 20px; transition: background 0.3s; }
         
-        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.5rem; }
-        
-        .settings-icon { font-size: 1.5rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.4rem; letter-spacing: 1px; }
+        .settings-icon { font-size: 1.3rem; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
 
-        #game-list { list-style: none; padding: 0; margin: 0; }
+        /* TABS */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .nav-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); 
+            display: flex; justify-content: space-around; padding: 15px 0; 
+            border-top: 1px solid var(--ui); z-index: 1000; padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+        .nav-item { color: #64748b; font-weight: 700; font-size: 0.85rem; text-align: center; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+
+        /* LISTS */
+        .game-list { list-style: none; padding: 0; margin: 0; }
         .game-item { 
-            background: var(--card); margin-bottom: 12px; padding: 12px 16px; 
+            background: var(--card); margin-bottom: 12px; padding: 14px 16px; 
             border-radius: 18px; display: flex; align-items: center; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 1px solid var(--ui);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--ui);
         }
-        
-        .rank { font-weight: 900; font-size: 1.3rem; margin-right: 15px; color: var(--accent); min-width: 30px; text-align: center; }
+        .rank { font-weight: 900; font-size: 1.2rem; margin-right: 15px; color: var(--accent); min-width: 25px; }
         .game-info { flex-grow: 1; }
-        .game-title { font-weight: 700; font-size: 1.1rem; display: block; }
-        .game-meta { font-size: 0.8rem; color: #64748b; font-weight: 600; margin-top: 2px; }
-        .rating-display { color: var(--star); }
+        .game-title { font-weight: 700; font-size: 1.05rem; display: block; }
+        .game-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; font-weight: 600; }
+        .controls { display: flex; align-items: center; gap: 12px; margin-left: 10px; border-left: 1px solid var(--ui); padding-left: 15px; }
+        .drag-handle { font-size: 1.4rem; color: #475569; padding: 5px; cursor: grab; }
 
-        .controls { display: flex; align-items: center; gap: 15px; margin-left: 10px; border-left: 1px solid var(--ui); padding-left: 15px; }
-        .drag-handle { font-size: 1.5rem; color: #475569; cursor: grab; padding: 5px; }
-
-        /* FULLSCREEN MODALS */
-        .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 20px; z-index: 100; flex-direction: column; overflow-y: auto; }
+        /* MODALS */
+        .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
         .modal.active { display: flex; }
+        .big-rating { font-size: 4rem; font-weight: 900; color: var(--star); text-align: center; margin: 10px 0; }
 
-        input, textarea, select { 
-            width: 100%; background: var(--ui); color: white; border: 1px solid #334155; 
-            border-radius: 12px; padding: 14px; margin-top: 10px; box-sizing: border-box; font-size: 16px; 
-        }
-        
+        input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
         button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
         button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
         
-        /* SETTINGS SPECIFIC */
-        .settings-section { margin-bottom: 30px; }
-        .settings-label { display: block; margin-bottom: 10px; font-weight: bold; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
-        .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .theme-btn { padding: 15px; border-radius: 12px; border: 2px solid transparent; font-weight: bold; font-size: 0.8rem; }
-        .theme-btn.active { border-color: var(--accent); }
-
-        .big-rating { font-size: 4rem; font-weight: 900; color: var(--star); text-align: center; margin: 10px 0; }
-        .hours-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .finish-btn { background: var(--backlog) !important; color: white !important; margin-top: 10px !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>MASTER RANKER</h1>
+    <div class="header">
+        <h1 id="page-title">RANKINGS</h1>
         <div class="settings-icon" onclick="toggleModal('settings-modal')">⚙️</div>
     </div>
-    
-    <button class="primary" style="margin-bottom: 20px; margin-top: 0; background: #10b981; color: white;" onclick="addNewGame()">+ Add New Game</button>
-    <ul id="game-list"></ul>
+
+    <div id="tab-ranked" class="tab-content active">
+        <button class="primary" style="margin-bottom: 20px; margin-top:0; background: var(--accent); color: #000;" onclick="addNewGame('ranked')">+ Add Ranked Game</button>
+        <ul id="ranked-list" class="game-list"></ul>
+    </div>
+
+    <div id="tab-backlog" class="tab-content">
+        <button class="primary" style="margin-bottom: 20px; margin-top:0; background: var(--backlog); color: white;" onclick="addNewGame('backlog')">+ Add to Backlog</button>
+        <ul id="backlog-list" class="game-list"></ul>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" id="nav-ranked" onclick="switchTab('ranked')">
+            <span class="nav-icon">🏆</span>Ranked
+        </div>
+        <div class="nav-item" id="nav-backlog" onclick="switchTab('backlog')">
+            <span class="nav-icon">⏳</span>Backlog
+        </div>
+    </nav>
 
     <div id="review-modal" class="modal">
-        <h2 id="modal-title" style="color: var(--accent); text-align: center;">Game Review</h2>
-        <div id="rating-num" class="big-rating">0.0</div>
-        <input type="range" id="rating-slider" min="0" max="10" step="0.1" value="0" oninput="updateRatingLabel(this.value)">
+        <h2 id="review-title" style="color: var(--accent); text-align: center; margin-top:0;">Game Title</h2>
         
-        <div class="hours-row">
-            <span style="white-space: nowrap; font-weight: bold;">Hours:</span>
-            <input type="number" id="game-hours" placeholder="Total hours played..." style="margin-top: 0;">
+        <div id="ranked-inputs">
+            <div id="rating-num" class="big-rating">0.0</div>
+            <input type="range" id="rating-slider" min="0" max="10" step="0.1" value="0" oninput="updateRatingLabel(this.value)">
+            <input type="number" id="game-hours" placeholder="Total hours played...">
         </div>
 
-        <textarea id="review-text" placeholder="What did you think?"></textarea>
+        <textarea id="review-text" placeholder="Playthrough notes or review..."></textarea>
         
-        <button class="primary" onclick="saveReview()">Save Progress</button>
+        <button class="primary" onclick="saveGameData()">Save Progress</button>
+        <button id="move-to-ranked-btn" class="primary finish-btn" style="display:none;" onclick="upgradeToRanked()">Mark as Finished 🏆</button>
         <button class="secondary" style="color: var(--danger);" onclick="deleteCurrentGame()">Delete Game</button>
-        <button class="secondary" onclick="toggleModal('review-modal')">Cancel</button>
+        <button class="secondary" onclick="closeModals()">Cancel</button>
     </div>
 
     <div id="settings-modal" class="modal">
-        <h2 style="color: var(--accent); margin-bottom: 30px;">Settings</h2>
+        <h2 style="color: var(--accent);">Settings</h2>
+        <p style="color: #64748b; font-size: 0.9rem;">Themes & Data Backup</p>
         
-        <div class="settings-section">
-            <span class="settings-label">Color Theme</span>
-            <div class="theme-grid">
-                <button class="theme-btn" style="background:#0b0f1a; color: #38bdf8;" onclick="setTheme('default')">Classic</button>
-                <button class="theme-btn" style="background:#000; color: #a855f7;" onclick="setTheme('midnight')">Midnight</button>
-                <button class="theme-btn" style="background:#1a0b0b; color: #f87171;" onclick="setTheme('crimson')">Crimson</button>
-            </div>
-        </div>
+        <select onchange="setTheme(this.value)" id="theme-select" style="margin-bottom: 20px;">
+            <option value="default">Theme: Classic Blue</option>
+            <option value="midnight">Theme: Midnight Purple</option>
+            <option value="crimson">Theme: Crimson Red</option>
+        </select>
 
-        <div class="settings-section">
-            <span class="settings-label">Data Management</span>
-            <button class="primary" onclick="exportData()">💾 Export Backup (.json)</button>
-            <button class="secondary" onclick="document.getElementById('import-input').click()">📂 Import Backup</button>
-            <input type="file" id="import-input" style="display: none;" onchange="importData(event)">
-        </div>
-
+        <button class="primary" onclick="exportData()">💾 Backup All Data (.json)</button>
+        <button class="secondary" onclick="document.getElementById('import-input').click()">📂 Restore Backup</button>
+        <input type="file" id="import-input" style="display: none;" onchange="importData(event)">
+        
         <div style="flex-grow: 1;"></div>
-        <button class="primary" onclick="toggleModal('settings-modal')">Done</button>
+        <button class="primary" onclick="closeModals()">Done</button>
     </div>
 
     <script>
         let games = JSON.parse(localStorage.getItem('myGames')) || [];
-        let currentTheme = localStorage.getItem('appTheme') || 'default';
+        let backlog = JSON.parse(localStorage.getItem('myBacklog')) || [];
+        let currentTab = 'ranked';
         let currentEditingId = null;
 
-        document.documentElement.setAttribute('data-theme', currentTheme);
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('appTheme', theme);
+        }
+        setTheme(localStorage.getItem('appTheme') || 'default');
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            document.getElementById('page-title').innerText = tab.toUpperCase();
+            render();
+        }
 
         function render() {
-            const list = document.getElementById('game-list');
+            renderList('ranked-list', games, true);
+            renderList('backlog-list', backlog, false);
+            localStorage.setItem('myGames', JSON.stringify(games));
+            localStorage.setItem('myBacklog', JSON.stringify(backlog));
+        }
+
+        function renderList(elementId, data, isRanked) {
+            const list = document.getElementById(elementId);
             list.innerHTML = '';
-            games.forEach((game, index) => {
+            data.forEach((game, index) => {
                 const li = document.createElement('li');
                 li.className = 'game-item';
                 li.setAttribute('data-id', game.id);
-                const score = parseFloat(game.rating || 0).toFixed(1);
-                const hours = game.hours ? ` • ${game.hours}h` : '';
+                const meta = isRanked ? `<span style="color:var(--star)">★ ${parseFloat(game.rating).toFixed(1)}</span> • ${game.hours || 0}h` : `Notes written ✓`;
                 
                 li.innerHTML = `
                     <div class="rank">${index + 1}</div>
-                    <div class="game-info" onclick="openReview('${game.id}')">
+                    <div class="game-info" onclick="openGameModal('${game.id}', ${isRanked})">
                         <span class="game-title">${game.title}</span>
-                        <div class="game-meta"><span class="rating-display">★ ${score}</span>${hours}</div>
+                        <div class="game-meta">${meta}</div>
                     </div>
                     <div class="controls"><div class="drag-handle">≡</div></div>
                 `;
                 list.appendChild(li);
             });
-            localStorage.setItem('myGames', JSON.stringify(games));
         }
 
-        // NAVIGATION & THEME
-        function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
-        
-        function setTheme(theme) {
-            currentTheme = theme;
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('appTheme', theme);
-        }
-
-        // DATA ACTIONS
-        function exportData() {
-            const blob = new Blob([JSON.stringify(games)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Game-Rankings-Backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        }
-
-        function importData(event) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imported = JSON.parse(e.target.result);
-                if(confirm("This will replace your current list. Continue?")) {
-                    games = imported;
-                    render();
-                    alert("Imported successfully!");
-                }
-            };
-            reader.readAsText(event.target.files[0]);
-        }
-
-        // CORE LOGIC
-        function updateRatingLabel(val) { document.getElementById('rating-num').innerText = parseFloat(val).toFixed(1); }
-
-        new Sortable(document.getElementById('game-list'), {
-            handle: '.drag-handle', animation: 250,
-            onEnd: function() {
-                const newOrder = Array.from(document.getElementById('game-list').children).map(li => li.getAttribute('data-id'));
-                games = newOrder.map(id => games.find(g => g.id === id));
-                render();
-            }
-        });
-
-        function addNewGame() {
-            const title = prompt("Game Title:");
-            if (title) { games.push({ id: Date.now().toString(), title, review: "", rating: 0, hours: "" }); render(); }
-        }
-
-        function openReview(id) {
+        function openGameModal(id, isRanked) {
             currentEditingId = id;
-            const game = games.find(g => g.id === id);
-            document.getElementById('modal-title').innerText = game.title;
+            const list = isRanked ? games : backlog;
+            const game = list.find(g => g.id === id);
+            
+            document.getElementById('review-title').innerText = game.title;
             document.getElementById('review-text').value = game.review || "";
-            document.getElementById('game-hours').value = game.hours || "";
-            document.getElementById('rating-slider').value = game.rating || 0;
-            updateRatingLabel(game.rating || 0);
+            document.getElementById('ranked-inputs').style.display = isRanked ? 'block' : 'none';
+            document.getElementById('move-to-ranked-btn').style.display = isRanked ? 'none' : 'block';
+            
+            if(isRanked) {
+                document.getElementById('rating-slider').value = game.rating || 0;
+                document.getElementById('game-hours').value = game.hours || "";
+                updateRatingLabel(game.rating || 0);
+            }
             toggleModal('review-modal');
         }
 
-        function saveReview() {
-            const game = games.find(g => g.id === currentEditingId);
+        function upgradeToRanked() {
+            const gameIdx = backlog.findIndex(g => g.id === currentEditingId);
+            const game = backlog[gameIdx];
+            backlog.splice(gameIdx, 1);
+            game.rating = 0; // Default for new ranked
+            game.hours = "";
+            games.push(game);
+            switchTab('ranked');
+            openGameModal(game.id, true);
+        }
+
+        function saveGameData() {
+            const isRanked = games.some(g => g.id === currentEditingId);
+            const list = isRanked ? games : backlog;
+            const game = list.find(g => g.id === currentEditingId);
+            
             game.review = document.getElementById('review-text').value;
-            game.hours = document.getElementById('game-hours').value;
-            game.rating = document.getElementById('rating-slider').value;
-            toggleModal('review-modal');
+            if(isRanked) {
+                game.rating = document.getElementById('rating-slider').value;
+                game.hours = document.getElementById('game-hours').value;
+            }
+            closeModals();
             render();
         }
 
         function deleteCurrentGame() {
-            if(confirm("Delete this game forever?")) {
+            if(confirm("Delete this game from all lists?")) {
                 games = games.filter(g => g.id !== currentEditingId);
-                toggleModal('review-modal');
+                backlog = backlog.filter(g => g.id !== currentEditingId);
+                closeModals();
                 render();
             }
         }
 
-        render();
-    </script>
-</body>
-</html>
+        function addNewGame(type) {
+            const title = prompt("Game Title:");
+            if(!title) return;
+            const newGame = { id: Date.now().toString(), title, review: "", rating: 0, hours: "" };
+            if(type === 'ranked') games.push(newGame);
+            else backlog.push(newGame);
+            render();
+        }
+
+        function updateRatingLabel(v) { document.getElementById('rating-num').innerText = parseFloat(v).toFixed(1); }
+        function toggleModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+        
+        function exportData() {
+            const data = { ranked: games, backlog: backlog, theme: currentTheme };
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Game-Journal-Backup.json`;
+            a.click();
+        }
+
+        function importData(e) {
+            const reader = new FileReader();
+            reader.onload = (file) => {
+                const d = JSON.parse(file.target.result);
+                games = d.ranked ||
