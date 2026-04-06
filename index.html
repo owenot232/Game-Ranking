@@ -3,52 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Ranker</title>
+    <title>Game Ranker Pro</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f1f5f9; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        h1 { text-align: center; color: var(--accent); }
+        :root { --bg: #0b0f1a; --card: #161e2e; --accent: #38bdf8; --star: #fbbf24; --text: #f1f5f9; --danger: #ef4444; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; -webkit-tap-highlight-color: transparent; }
+        h1 { text-align: center; color: var(--accent); margin-bottom: 5px; font-weight: 800; letter-spacing: -1px; }
+        p.subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+        
         #game-list { list-style: none; padding: 0; }
         .game-item { 
-            background: var(--card); margin-bottom: 10px; padding: 15px; 
-            border-radius: 12px; display: flex; align-items: center; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); cursor: grab;
+            background: var(--card); margin-bottom: 12px; padding: 16px; 
+            border-radius: 16px; display: flex; align-items: center; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid #1e293b;
         }
-        .rank { font-weight: bold; font-size: 1.2rem; margin-right: 15px; color: var(--accent); min-width: 30px; }
+        .rank { font-weight: 900; font-size: 1.4rem; margin-right: 15px; color: var(--accent); min-width: 35px; text-align: center; font-style: italic; }
         .game-info { flex-grow: 1; }
-        .game-title { font-weight: 600; display: block; }
+        .game-title { font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+        .rating-display { color: var(--star); font-size: 0.85rem; font-weight: bold; }
         
-        /* Modal Styles */
-        #modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            padding: 20px; align-items: center; justify-content: center; z-index: 100;
+        .delete-btn {
+            background: #1e293b; color: #475569; border: none; border-radius: 10px;
+            width: 32px; height: 32px; font-weight: bold; cursor: pointer;
+            margin-left: 10px; flex-shrink: 0; font-size: 1.2rem;
         }
-        .modal-content { background: var(--card); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; }
-        textarea { width: 100%; height: 150px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 10px; box-sizing: border-box; }
-        button { background: var(--accent); color: #0f172a; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; margin-top: 10px; width: 100%; }
-        .add-btn { background: #22c55e; margin-bottom: 20px; }
+
+        /* Modal / Review System */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); padding: 20px; align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid #334155; }
+        
+        /* Star Rating Selector */
+        .star-container { display: flex; justify-content: space-between; margin: 15px 0; direction: ltr; }
+        .star-input { font-size: 1.6rem; color: #334155; cursor: pointer; transition: transform 0.1s; }
+        .star-input.active { color: var(--star); text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        
+        textarea { 
+            width: 100%; height: 180px; background: #0b0f1a; color: white; 
+            border: 1px solid #334155; border-radius: 12px; padding: 12px; 
+            margin-top: 15px; box-sizing: border-box; font-size: 16px; line-height: 1.5;
+        }
+        
+        button { border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: opacity 0.2s; }
+        button:active { opacity: 0.7; }
+        .save-btn { background: var(--accent); color: #0b0f1a; width: 100%; margin-top: 20px; font-size: 1rem; }
+        .add-btn { background: #10b981; color: white; width: 100%; margin-bottom: 15px; font-size: 1rem; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .close-btn { background: transparent; color: #64748b; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>Game Rankings</h1>
-    <button class="add-btn" onclick="addNewGame()">+ Add New Game</button>
+    <h1>Top Tier Games</h1>
+    <p class="subtitle">Drag to rank. Tap for 10-star reviews.</p>
+    
+    <button class="add-btn" onclick="addNewGame()">+ Add Game to List</button>
     <ul id="game-list"></ul>
 
     <div id="modal">
         <div class="modal-content">
-            <h2 id="modal-title">Game Review</h2>
-            <textarea id="review-text" placeholder="What did you think of this game?"></textarea>
-            <button onclick="saveReview()">Save Review</button>
-            <button style="background:#ef4444; color:white;" onclick="closeModal()">Close</button>
+            <h2 id="modal-title" style="margin:0; font-size: 1.5rem;">Game Review</h2>
+            
+            <div id="star-row" class="star-container">
+                </div>
+            <div id="rating-label" style="text-align:center; color: var(--star); font-weight: bold; font-size: 1.2rem;">0/10</div>
+
+            <textarea id="review-text" placeholder="What makes this game special?"></textarea>
+            
+            <button class="save-btn" onclick="saveReview()">Save Review & Rating</button>
+            <button class="close-btn" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <script>
         let games = JSON.parse(localStorage.getItem('myGames')) || [];
         let currentEditingId = null;
+        let tempRating = 0;
 
         const list = document.getElementById('game-list');
         const modal = document.getElementById('modal');
@@ -59,21 +88,44 @@
                 const li = document.createElement('li');
                 li.className = 'game-item';
                 li.setAttribute('data-id', game.id);
+                
+                const scoreText = game.rating ? `★ ${game.rating}/10` : 'No rating yet';
+                
                 li.innerHTML = `
-                    <div class="rank">#${index + 1}</div>
+                    <div class="rank">${index + 1}</div>
                     <div class="game-info" onclick="openReview('${game.id}')">
                         <span class="game-title">${game.title}</span>
-                        <small style="color:#94a3b8">${game.review ? 'Review written ✓' : 'Tap to add review...'}</small>
+                        <span class="rating-display">${scoreText}</span>
                     </div>
+                    <button class="delete-btn" onclick="deleteGame('${game.id}', event)">×</button>
                 `;
                 list.appendChild(li);
             });
             localStorage.setItem('myGames', JSON.stringify(games));
         }
 
-        // Drag and Drop Logic
+        // Initialize Star Selector in Modal
+        const starRow = document.getElementById('star-row');
+        for (let i = 1; i <= 10; i++) {
+            const span = document.createElement('span');
+            span.className = 'star-input';
+            span.innerHTML = '★';
+            span.onclick = () => setRating(i);
+            starRow.appendChild(span);
+        }
+
+        function setRating(num) {
+            tempRating = num;
+            document.getElementById('rating-label').innerText = `${num}/10`;
+            const stars = document.querySelectorAll('.star-input');
+            stars.forEach((s, idx) => {
+                s.classList.toggle('active', idx < num);
+            });
+        }
+
+        // Drag and Drop
         new Sortable(list, {
-            animation: 150,
+            animation: 200,
             onEnd: function() {
                 const newOrder = Array.from(list.children).map(li => li.getAttribute('data-id'));
                 games = newOrder.map(id => games.find(g => g.id === id));
@@ -84,7 +136,15 @@
         function addNewGame() {
             const title = prompt("Game Title:");
             if (title) {
-                games.push({ id: Date.now().toString(), title, review: "" });
+                games.push({ id: Date.now().toString(), title, review: "", rating: 0 });
+                render();
+            }
+        }
+
+        function deleteGame(id, event) {
+            event.stopPropagation();
+            if (confirm("Remove this game from your rankings?")) {
+                games = games.filter(g => g.id !== id);
                 render();
             }
         }
@@ -94,19 +154,20 @@
             const game = games.find(g => g.id === id);
             document.getElementById('modal-title').innerText = game.title;
             document.getElementById('review-text').value = game.review;
+            setRating(game.rating || 0);
             modal.style.display = 'flex';
         }
 
         function saveReview() {
             const game = games.find(g => g.id === currentEditingId);
             game.review = document.getElementById('review-text').value;
+            game.rating = tempRating;
             closeModal();
             render();
         }
 
         function closeModal() { modal.style.display = 'none'; }
 
-        // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
