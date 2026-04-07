@@ -59,11 +59,15 @@
 
         .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
         .modal.active { display: flex; }
+        
+        /* THE CRITICAL FIX: Make the review window higher than the shame window */
+        #modal-review { z-index: 3000; }
+
         input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
-        button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
-        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
+        button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; cursor: pointer; }
+        button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; cursor: pointer; }
         .drop-btn { background: var(--danger) !important; color: white !important; margin-top: 10px !important; }
-        .revive-btn { background: var(--accent) !important; color: #000 !important; margin-top: 10px !important; }
+        .revive-btn { background: var(--backlog) !important; color: white !important; margin-top: 10px !important; }
     </style>
 </head>
 <body data-theme="default">
@@ -184,28 +188,33 @@
         function render() {
             const sort = document.getElementById('sort-type').value;
             const genreFilter = document.getElementById('filter-genre-main').value;
-            const sRanked = document.getElementById('search-ranked').value.toLowerCase();
-            const sBacklog = document.getElementById('search-backlog').value.toLowerCase();
+            const searchRanked = document.getElementById('search-ranked').value.toLowerCase();
+            const searchBacklog = document.getElementById('search-backlog').value.toLowerCase();
 
+            // Handle Ranked List
             let dR = [...ranked];
             if(genreFilter !== 'all') dR = dR.filter(g => g.genre === genreFilter);
-            if(sRanked) dR = dR.filter(g => g.title.toLowerCase().includes(sRanked));
+            if(searchRanked) dR = dR.filter(g => g.title.toLowerCase().includes(searchRanked));
             if(sort === 'high') dR.sort((a,b) => b.rating - a.rating);
             else if(sort === 'low') dR.sort((a,b) => a.rating - b.rating);
             else if(sort === 'hours') dR.sort((a,b) => b.hours - a.hours);
 
             const rL = document.getElementById('list-ranked'); rL.innerHTML = '';
             dR.forEach((g, i) => {
-                const isP = sort === 'manual' && genreFilter === 'all' && !sRanked;
+                const isP = sort === 'manual' && genreFilter === 'all' && !searchRanked;
                 const pC = isP && i < 3 ? `rank-${i+1}` : '';
                 rL.innerHTML += `<li class="game-item ${pC}" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'ranked')"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h <span class="tag">${g.genre}</span></div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
+            // Handle Backlog List
+            let dB = [...backlog];
+            if(searchBacklog) dB = dB.filter(g => g.title.toLowerCase().includes(searchBacklog));
             const bL = document.getElementById('list-backlog'); bL.innerHTML = '';
-            backlog.filter(g => g.title.toLowerCase().includes(sBacklog)).forEach((g, i) => {
+            dB.forEach((g, i) => {
                 bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">In queue...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
+            // Handle Shame List
             const shL = document.getElementById('list-shame'); shL.innerHTML = '';
             shame.forEach((g) => {
                 shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Dropped • Tap to view notes</div></div></li>`;
@@ -230,6 +239,7 @@
             editId = id; editSource = src;
             const list = src === 'ranked' ? ranked : (src === 'backlog' ? backlog : (src === 'playing' ? playing : shame));
             const g = list.find(x => x.id === id);
+            
             document.getElementById('m-title').innerText = g.title;
             document.getElementById('m-text').value = g.review || "";
             document.getElementById('rating-ui').style.display = (src === 'backlog' || src === 'shame') ? 'none' : 'block';
@@ -237,23 +247,37 @@
             document.getElementById('m-start').style.display = src === 'backlog' ? 'block' : 'none';
             document.getElementById('m-drop').style.display = (src === 'backlog' || src === 'playing') ? 'block' : 'none';
             document.getElementById('m-revive').style.display = src === 'shame' ? 'block' : 'none';
+            
             document.getElementById('m-slider').value = g.rating || 0;
             document.getElementById('m-rating-num').innerText = parseFloat(g.rating || 0).toFixed(1);
             document.getElementById('m-hours').value = g.hours || "";
             document.getElementById('m-genre').value = g.genre || "Action";
             document.getElementById('m-month').value = g.month || "";
             document.getElementById('m-year').value = g.year || "";
+            
             document.getElementById('modal-review').classList.add('active');
         }
 
-        function moveBacklogToPlaying() { const idx = backlog.findIndex(x => x.id === editId); const g = backlog.splice(idx, 1)[0]; playing.unshift(g); closeModals(); switchTab('playing', document.querySelectorAll('.nav-item')[2]); }
-        function moveToRanked() { const idx = playing.findIndex(x => x.id === editId); const g = playing.splice(idx, 1)[0]; ranked.push(g); closeModals(); switchTab('ranked', document.querySelectorAll('.nav-item')[0]); }
-        
+        function moveBacklogToPlaying() {
+            const idx = backlog.findIndex(x => x.id === editId);
+            const g = backlog.splice(idx, 1)[0];
+            playing.unshift(g);
+            closeModals(); switchTab('playing', document.querySelectorAll('.nav-item')[2]);
+        }
+
+        function moveToRanked() {
+            const idx = playing.findIndex(x => x.id === editId);
+            const g = playing.splice(idx, 1)[0];
+            ranked.push(g);
+            closeModals(); switchTab('ranked', document.querySelectorAll('.nav-item')[0]);
+        }
+
         function moveToShame() { 
             const list = editSource === 'backlog' ? backlog : playing;
             const idx = list.findIndex(x => x.id === editId);
             const g = list.splice(idx, 1)[0];
-            shame.push(g); closeModals(); openShame();
+            shame.push(g);
+            closeModals(); openShame();
         }
 
         function reviveFromShame() {
@@ -266,9 +290,12 @@
         function saveGame() {
             const list = editSource === 'ranked' ? ranked : (editSource === 'backlog' ? backlog : (editSource === 'playing' ? playing : shame));
             const g = list.find(x => x.id === editId);
-            g.review = document.getElementById('m-text').value; g.rating = document.getElementById('m-slider').value;
-            g.hours = document.getElementById('m-hours').value; g.genre = document.getElementById('m-genre').value;
-            g.month = document.getElementById('m-month').value; g.year = document.getElementById('m-year').value;
+            g.review = document.getElementById('m-text').value;
+            g.rating = document.getElementById('m-slider').value;
+            g.hours = document.getElementById('m-hours').value;
+            g.genre = document.getElementById('m-genre').value;
+            g.month = document.getElementById('m-month').value;
+            g.year = document.getElementById('m-year').value;
             closeModals(); render(); renderPlaying();
         }
 
@@ -279,7 +306,16 @@
             render(); renderPlaying();
         }
 
-        function deleteGame() { if(confirm("Delete forever?")) { ranked = ranked.filter(x => x.id !== editId); backlog = backlog.filter(x => x.id !== editId); playing = playing.filter(x => x.id !== editId); shame = shame.filter(x => x.id !== editId); closeModals(); render(); renderPlaying(); } }
+        function deleteGame() {
+            if(confirm("Delete forever?")) {
+                ranked = ranked.filter(x => x.id !== editId);
+                backlog = backlog.filter(x => x.id !== editId);
+                playing = playing.filter(x => x.id !== editId);
+                shame = shame.filter(x => x.id !== editId);
+                closeModals(); render(); renderPlaying();
+            }
+        }
+
         function openSettings() { document.getElementById('modal-settings').classList.add('active'); }
         function openShame() { render(); document.getElementById('modal-shame').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
@@ -310,6 +346,7 @@
             backlog = order.map(id => backlog.find(g => g.id === id));
             render();
         }});
+
         render();
     </script>
 </body>
