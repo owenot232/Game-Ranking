@@ -106,11 +106,7 @@
 
     <div id="tab-stats" class="tab-content">
         <div class="stats-grid" id="stats-area"></div>
-        <div id="persona-box" class="stat-card" style="margin-top:12px;">
-            <span class="stat-label">Gaming Persona</span>
-            <span class="stat-val" id="persona-val" style="font-size:1.2rem; margin-top:5px;">Novice</span>
-        </div>
-        <button class="primary" style="margin-top:12px; background:var(--shame); color:white;" onclick="openShame()">View Hall of Shame 🪦</button>
+        <button class="primary" style="margin-top:20px; background:var(--shame); color:white;" onclick="openShame()">View Hall of Shame 🪦</button>
         <button class="primary" style="margin-top:12px; background:#4ade80; color:#000;" onclick="copyShareCard()">📋 Copy Player Profile</button>
     </div>
 
@@ -147,7 +143,7 @@
 
     <div id="modal-shame" class="modal">
         <h2 style="color:var(--shame); text-align:center;">THE HALL OF SHAME</h2>
-        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-bottom:20px;">Games that weren't worth the grind.</p>
+        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-bottom:20px;">The archive of the abandoned.</p>
         <ul id="list-shame" class="game-list"></ul>
         <div style="flex-grow:1"></div>
         <button class="primary" onclick="closeModals()">Back to Stats</button>
@@ -212,7 +208,7 @@
 
             const shL = document.getElementById('list-shame'); shL.innerHTML = '';
             shame.forEach((g) => {
-                shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Dropped • Tap to view post-mortem</div></div></li>`;
+                shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Dropped • Tap to view notes</div></div></li>`;
             });
 
             localStorage.setItem('myGames', JSON.stringify(ranked));
@@ -293,8 +289,6 @@
             const avg = t ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / t).toFixed(1) : "0.0";
             const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
             document.getElementById('stats-area').innerHTML = `<div class="stat-card"><span class="stat-val">${t}</span><span class="stat-label">Conquered</span></div><div class="stat-card"><span class="stat-val">${s}</span><span class="stat-label">Dropped</span></div><div class="stat-card"><span class="stat-val">${avg}</span><span class="stat-label">Avg Rating</span></div><div class="stat-card"><span class="stat-val">${hrs}h</span><span class="stat-label">Total Time</span></div>`;
-            const genres = ranked.map(g => g.genre); const mC = genres.sort((a,b) => genres.filter(v => v===a).length - genres.filter(v => v===b).length).pop();
-            document.getElementById('persona-val').innerText = t > 5 ? (mC + " Master") : "Casual Player";
         }
 
         function copyShareCard() {
