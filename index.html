@@ -21,36 +21,40 @@
         h1 { margin: 0; color: var(--accent); font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; }
         .settings-icon { font-size: 1.2rem; cursor: pointer; background: var(--card); padding: 8px; border-radius: 12px; border: 1px solid var(--ui); }
 
-        .search-box { width: 100%; background: var(--card); border: 1px solid var(--ui); border-radius: 12px; padding: 10px 15px; color: white; font-size: 0.85rem; margin-bottom: 12px; outline: none; box-sizing: border-box; }
+        .search-box { width: 100%; background: var(--card); border: 1px solid var(--ui); border-radius: 12px; padding: 10px 15px; color: white; font-size: 0.9rem; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-select { background: var(--card); color: var(--text); border: 1px solid var(--ui); padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; min-width: max-content; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--ui); z-index: 1000; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-        .nav-item { color: #475569; font-weight: 700; font-size: 0.65rem; text-align: center; flex: 1; }
+        .nav-item { color: #64748b; font-weight: 700; font-size: 0.7rem; text-align: center; flex: 1; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
+        .nav-icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
 
         .game-list { list-style: none; padding: 0; margin: 0; }
         .game-item { background: var(--card); margin-bottom: 10px; padding: 14px; border-radius: 18px; display: flex; align-items: center; border: 1px solid var(--ui); }
         
-        .rank-1 { border: 1px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
+        .rank-1 { border: 1px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); }
         .rank-1 .rank { color: var(--gold) !important; }
-        
-        .rank { font-weight: 900; font-size: 1.1rem; margin-right: 12px; color: var(--accent); min-width: 20px; text-align: center; }
+
+        .rank { font-weight: 900; font-size: 1.2rem; margin-right: 12px; color: var(--accent); min-width: 25px; text-align: center; }
         .game-info { flex-grow: 1; }
-        .game-title { font-weight: 700; font-size: 0.95rem; display: block; }
+        .game-title { font-weight: 700; font-size: 1rem; display: block; }
         .game-meta { font-size: 0.75rem; color: #64748b; margin-top: 3px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
         .tag { background: var(--ui); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: var(--accent); }
-        .drag-handle { font-size: 1.4rem; color: #475569; padding: 5px; cursor: grab; }
+        .drag-handle { font-size: 1.4rem; color: #475569; padding: 5px; cursor: grab; margin-left: 10px; }
 
-        .lab-card { background: linear-gradient(145deg, var(--card), var(--ui)); padding: 20px; border-radius: 24px; border: 1px solid var(--playing); margin-bottom: 20px; }
-        .shame-card { border: 1px solid var(--shame); opacity: 0.8; }
+        .lab-card { background: linear-gradient(145deg, var(--card), var(--ui)); padding: 20px; border-radius: 24px; border: 1px solid var(--playing); margin-bottom: 20px; position: relative; }
+        .lab-title { font-size: 1.4rem; font-weight: 900; color: var(--playing); margin-bottom: 10px; display: block; }
+        .comparison-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: center; border: 1px dashed var(--accent); }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid var(--ui); text-align: center; }
-        .stat-val { display: block; font-size: 1.5rem; font-weight: 900; color: var(--accent); }
+        .stat-val { display: block; font-size: 1.6rem; font-weight: 900; color: var(--accent); }
         .stat-label { font-size: 0.6rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
 
         .modal { display: none; position: fixed; inset: 0; background: var(--bg); padding: 25px; z-index: 2000; flex-direction: column; overflow-y: auto; }
@@ -58,7 +62,7 @@
         input, textarea, select { width: 100%; background: var(--ui); color: white; border: 1px solid #334155; border-radius: 14px; padding: 14px; margin-top: 10px; font-size: 16px; outline: none; box-sizing: border-box; }
         button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
         button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
-        .drop-btn { background: var(--danger) !important; color: white !important; }
+        .drop-btn { background: var(--danger) !important; color: white !important; margin-top: 10px !important; }
     </style>
 </head>
 <body data-theme="default">
@@ -68,14 +72,28 @@
         <div class="settings-icon" onclick="openSettings()">⚙️</div>
     </div>
 
+    <div id="filter-container" class="filter-bar">
+        <select class="filter-select" id="sort-type" onchange="render()">
+            <option value="manual">Sort: Manual</option>
+            <option value="high">Sort: Rating (High)</option>
+            <option value="low">Sort: Rating (Low)</option>
+            <option value="hours">Sort: Hours</option>
+        </select>
+        <select class="filter-select" id="filter-genre-main" onchange="render()">
+            <option value="all">Genre: All</option>
+            <option value="Action">Action</option><option value="RPG">RPG</option><option value="Open World">Open World</option>
+            <option value="Shooter">Shooter</option><option value="Horror">Horror</option><option value="Indie">Indie</option>
+        </select>
+    </div>
+
     <div id="tab-ranked" class="tab-content active">
-        <input type="text" class="search-box" id="s-ranked" placeholder="Search rankings..." oninput="render()">
+        <input type="text" class="search-box" id="search-ranked" placeholder="Search rankings..." oninput="render()">
         <button class="primary" style="margin-bottom:20px; margin-top:0;" onclick="addNew('ranked')">+ New Ranked Game</button>
         <ul id="list-ranked" class="game-list"></ul>
     </div>
 
     <div id="tab-backlog" class="tab-content">
-        <input type="text" class="search-box" id="s-backlog" placeholder="Search backlog..." oninput="render()">
+        <input type="text" class="search-box" id="search-backlog" placeholder="Search backlog..." oninput="render()">
         <button class="primary" style="margin-bottom:20px; margin-top:0; background:var(--backlog); color:white;" onclick="addNew('backlog')">+ Add to Backlog</button>
         <ul id="list-backlog" class="game-list"></ul>
     </div>
@@ -85,21 +103,20 @@
         <button class="primary" style="background:var(--playing); color:white;" onclick="addNew('playing')">+ Start New Game</button>
     </div>
 
-    <div id="tab-shame" class="tab-content">
-        <p style="text-align:center; color:var(--shame); font-size:0.8rem; font-weight:bold; text-transform:uppercase;">The Hall of Shame</p>
-        <ul id="list-shame" class="game-list"></ul>
-    </div>
-
     <div id="tab-stats" class="tab-content">
         <div class="stats-grid" id="stats-area"></div>
-        <button class="primary" style="margin-top:12px; background:#4ade80; color:#000;" onclick="copyShareCard()">📋 Copy Profile</button>
+        <div id="persona-box" class="stat-card" style="margin-top:12px;">
+            <span class="stat-label">Gaming Persona</span>
+            <span class="stat-val" id="persona-val" style="font-size:1.2rem; margin-top:5px;">Novice</span>
+        </div>
+        <button class="primary" style="margin-top:12px; background:var(--shame); color:white;" onclick="openShame()">View Hall of Shame 🪦</button>
+        <button class="primary" style="margin-top:12px; background:#4ade80; color:#000;" onclick="copyShareCard()">📋 Copy Player Profile</button>
     </div>
 
     <nav class="nav-bar">
         <div class="nav-item active" onclick="switchTab('ranked', this)"><span class="nav-icon">🏆</span>Ranked</div>
         <div class="nav-item" onclick="switchTab('backlog', this)"><span class="nav-icon">⏳</span>Backlog</div>
         <div class="nav-item" onclick="switchTab('playing', this)"><span class="nav-icon">🎮</span>Playing</div>
-        <div class="nav-item" onclick="switchTab('shame', this)"><span class="nav-icon">🪦</span>Dropped</div>
         <div class="nav-item" onclick="switchTab('stats', this)"><span class="nav-icon">📊</span>Stats</div>
     </nav>
 
@@ -108,16 +125,30 @@
         <div id="rating-ui">
             <div id="m-rating-num" style="font-size:3rem; font-weight:900; text-align:center; color:var(--star);">0.0</div>
             <input type="range" id="m-slider" min="0" max="10" step="0.1" value="0" oninput="document.getElementById('m-rating-num').innerText = parseFloat(this.value).toFixed(1)">
-            <input type="number" id="m-hours" placeholder="Hours...">
-            <select id="m-genre"><option value="Action">Action</option><option value="RPG">RPG</option><option value="Open World">Open World</option><option value="Shooter">Shooter</option><option value="Horror">Horror</option><option value="Indie">Indie</option></select>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="m-hours" placeholder="Hours...">
+                <select id="m-genre"><option value="Action">Action</option><option value="RPG">RPG</option><option value="Open World">Open World</option><option value="Shooter">Shooter</option><option value="Horror">Horror</option><option value="Indie">Indie</option></select>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <select id="m-month"><option value="">Month</option><option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option><option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option><option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option></select>
+                <input type="number" id="m-year" placeholder="Year">
+            </div>
         </div>
-        <textarea id="m-text" placeholder="Journal your thoughts..."></textarea>
+        <textarea id="m-text" placeholder="Your thoughts..."></textarea>
         <button class="primary" onclick="saveGame()">Save Changes</button>
         <button id="m-start" class="primary" style="background:var(--playing); color:white; display:none;" onclick="moveBacklogToPlaying()">Start Playing 🎮</button>
         <button id="m-finish" class="primary" style="background:var(--backlog); color:white; display:none;" onclick="moveToRanked()">Mark as Finished 🏆</button>
         <button id="m-drop" class="primary drop-btn" style="display:none;" onclick="moveToShame()">Drop Game 🪦</button>
         <button class="secondary" style="color:var(--danger);" onclick="deleteGame()">Delete Forever</button>
         <button class="secondary" onclick="closeModals()">Cancel</button>
+    </div>
+
+    <div id="modal-shame" class="modal">
+        <h2 style="color:var(--shame); text-align:center;">THE HALL OF SHAME</h2>
+        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-bottom:20px;">Games that were too mid to finish.</p>
+        <ul id="list-shame" class="game-list"></ul>
+        <div style="flex-grow:1"></div>
+        <button class="primary" onclick="closeModals()">Back to Stats</button>
     </div>
 
     <div id="modal-settings" class="modal">
@@ -146,29 +177,40 @@
             document.getElementById('tab-' + t).classList.add('active');
             el.classList.add('active');
             document.getElementById('page-title').innerText = t.toUpperCase();
+            document.getElementById('filter-container').style.display = (t === 'ranked') ? 'flex' : 'none';
             if(t === 'stats') updateStats();
             if(t === 'playing') renderPlaying();
             render();
         }
 
         function render() {
-            const sR = document.getElementById('s-ranked').value.toLowerCase();
-            const sB = document.getElementById('s-backlog').value.toLowerCase();
+            const sort = document.getElementById('sort-type').value;
+            const genreFilter = document.getElementById('filter-genre-main').value;
+            const sRanked = document.getElementById('search-ranked').value.toLowerCase();
+            const sBacklog = document.getElementById('search-backlog').value.toLowerCase();
+
+            let dR = [...ranked];
+            if(genreFilter !== 'all') dR = dR.filter(g => g.genre === genreFilter);
+            if(sRanked) dR = dR.filter(g => g.title.toLowerCase().includes(sRanked));
+            if(sort === 'high') dR.sort((a,b) => b.rating - a.rating);
+            else if(sort === 'low') dR.sort((a,b) => a.rating - b.rating);
+            else if(sort === 'hours') dR.sort((a,b) => b.hours - a.hours);
 
             const rL = document.getElementById('list-ranked'); rL.innerHTML = '';
-            ranked.filter(g => g.title.toLowerCase().includes(sR)).forEach((g, i) => {
-                const pC = i === 0 && !sR ? 'rank-1' : '';
+            dR.forEach((g, i) => {
+                const isP = sort === 'manual' && genreFilter === 'all' && !sRanked;
+                const pC = isP && i < 3 ? `rank-${i+1}` : '';
                 rL.innerHTML += `<li class="game-item ${pC}" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'ranked')"><span class="game-title">${g.title}</span><div class="game-meta"><span style="color:var(--star)">★ ${parseFloat(g.rating).toFixed(1)}</span> • ${g.hours || 0}h <span class="tag">${g.genre}</span></div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
             const bL = document.getElementById('list-backlog'); bL.innerHTML = '';
-            backlog.filter(g => g.title.toLowerCase().includes(sB)).forEach((g, i) => {
-                bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">In queue...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
+            backlog.filter(g => g.title.toLowerCase().includes(sBacklog)).forEach((g, i) => {
+                bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">Plan to play...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
             const shL = document.getElementById('list-shame'); shL.innerHTML = '';
             shame.forEach((g) => {
-                shL.innerHTML += `<li class="game-item shame-card"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Dropped • Tap for post-mortem</div></div></li>`;
+                shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Post-Mortem logged ✓</div></div></li>`;
             });
 
             localStorage.setItem('myGames', JSON.stringify(ranked));
@@ -179,9 +221,11 @@
 
         function renderPlaying() {
             const lab = document.getElementById('active-lab-content');
-            if(playing.length === 0) { lab.innerHTML = `<p style="text-align:center; color:#64748b;">No active sessions.</p>`; return; }
+            if(playing.length === 0) { lab.innerHTML = `<p style="text-align:center; color:#64748b;">No active games.</p>`; return; }
             const g = playing[0];
-            lab.innerHTML = `<div class="lab-card" onclick="openReview('${g.id}', 'playing')"><span class="lab-title">${g.title}</span><div>Predicted Score: <b style="color:var(--star)">★${parseFloat(g.rating).toFixed(1)}</b></div><p style="font-size:0.8rem; color:#94a3b8; margin-top:15px; border-top:1px solid #334155; padding-top:10px;">${g.review || "Notes..."}</p></div>`;
+            const rC = ranked.length > 0 ? ranked[Math.floor(Math.random() * Math.min(ranked.length, 10))] : null;
+            const cH = rC ? `<div class="comparison-box"><p style="font-size:0.8rem; margin:0">RANKING CHECK:</p><p style="font-weight:800; margin:5px 0;">Is this better than ${rC.title} (★${rC.rating})?</p></div>` : '';
+            lab.innerHTML = `<div class="lab-card" onclick="openReview('${g.id}', 'playing')"><span class="lab-title">${g.title}</span><div>Predicted: <b style="color:var(--star)">★${parseFloat(g.rating).toFixed(1)}</b></div>${cH}</div>`;
         }
 
         function openReview(id, src) {
@@ -191,13 +235,15 @@
             document.getElementById('m-title').innerText = g.title;
             document.getElementById('m-text').value = g.review || "";
             document.getElementById('rating-ui').style.display = (src === 'backlog' || src === 'shame') ? 'none' : 'block';
-            document.getElementById('m-finish').style.display = (src === 'playing') ? 'block' : 'none';
+            document.getElementById('m-finish').style.display = src === 'playing' ? 'block' : 'none';
             document.getElementById('m-start').style.display = src === 'backlog' ? 'block' : 'none';
             document.getElementById('m-drop').style.display = (src === 'backlog' || src === 'playing') ? 'block' : 'none';
             document.getElementById('m-slider').value = g.rating || 0;
             document.getElementById('m-rating-num').innerText = parseFloat(g.rating || 0).toFixed(1);
             document.getElementById('m-hours').value = g.hours || "";
             document.getElementById('m-genre').value = g.genre || "Action";
+            document.getElementById('m-month').value = g.month || "";
+            document.getElementById('m-year').value = g.year || "";
             document.getElementById('modal-review').classList.add('active');
         }
 
@@ -207,7 +253,7 @@
             const list = editSource === 'backlog' ? backlog : playing;
             const idx = list.findIndex(x => x.id === editId);
             const g = list.splice(idx, 1)[0];
-            shame.push(g); closeModals(); switchTab('shame', document.querySelectorAll('.nav-item')[3]);
+            shame.push(g); closeModals(); openShame();
         }
 
         function saveGame() {
@@ -215,25 +261,50 @@
             const g = list.find(x => x.id === editId);
             g.review = document.getElementById('m-text').value; g.rating = document.getElementById('m-slider').value;
             g.hours = document.getElementById('m-hours').value; g.genre = document.getElementById('m-genre').value;
+            g.month = document.getElementById('m-month').value; g.year = document.getElementById('m-year').value;
             closeModals(); render(); renderPlaying();
         }
 
         function addNew(type) {
             const t = prompt("Game Title:"); if(!t) return;
-            const n = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "", genre: "Action" };
+            const n = { id: Date.now().toString(), title: t, review: "", rating: 0, hours: "", genre: "Action", month: "", year: "" };
             if(type === 'ranked') ranked.push(n); else if(type === 'backlog') backlog.push(n); else playing.unshift(n);
             render(); renderPlaying();
         }
 
         function deleteGame() { if(confirm("Delete forever?")) { ranked = ranked.filter(x => x.id !== editId); backlog = backlog.filter(x => x.id !== editId); playing = playing.filter(x => x.id !== editId); shame = shame.filter(x => x.id !== editId); closeModals(); render(); renderPlaying(); } }
         function openSettings() { document.getElementById('modal-settings').classList.add('active'); }
+        function openShame() { render(); document.getElementById('modal-shame').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-        
         function updateStats() {
             const t = ranked.length; const s = shame.length;
-            const rate = (t + s) ? Math.round((t / (t + s)) * 100) : 0;
-            document.getElementById('stats-area').innerHTML = `<div class="stat-card"><span class="stat-val">${t}</span><span class="stat-label">Conquered</span></div><div class="stat-card"><span class="stat-val">${s}</span><span class="stat-label">Dropped</span></div><div class="stat-card" style="grid-column: span 2;"><span class="stat-val">${rate}%</span><span class="stat-label">Completion Rate</span></div>`;
+            const avg = t ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / t).toFixed(1) : "0.0";
+            const hrs = ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0);
+            document.getElementById('stats-area').innerHTML = `<div class="stat-card"><span class="stat-val">${t}</span><span class="stat-label">Conquered</span></div><div class="stat-card"><span class="stat-val">${s}</span><span class="stat-label">Dropped</span></div><div class="stat-card"><span class="stat-val">${avg}</span><span class="stat-label">Avg Rating</span></div><div class="stat-card"><span class="stat-val">${hrs}h</span><span class="stat-label">Total Time</span></div>`;
+            const genres = ranked.map(g => g.genre); const mC = genres.sort((a,b) => genres.filter(v => v===a).length - genres.filter(v => v===b).length).pop();
+            document.getElementById('persona-val').innerText = t > 5 ? (mC + " Master") : "Casual Player";
         }
 
-        function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({r: ranked, b: backlog, p: playing, s: shame})], {type:'application/json'})); a.download = 'GameLab_Ultimate.json'; a.click(); }
-        function importData(e) { const r = new FileReader(); r.onload = (f) => { const d = JSON.parse(f.target.result); ranked = d.r || []; backlog = d.b || []; playing
+        function copyShareCard() {
+            let text = `🎮 OWEN'S GAMING JOURNAL\n🏆 TOP 3:\n1. ${ranked[0]?.title}\n2. ${ranked[1]?.title}\n3. ${ranked[2]?.title}\n📊 Total Time: ${ranked.reduce((s, g) => s + (parseFloat(g.hours) || 0), 0)}h`;
+            navigator.clipboard.writeText(text); alert("Profile copied!");
+        }
+
+        function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({r: ranked, b: backlog, p: playing, s: shame})], {type:'application/json'})); a.download = 'GameLab_Backup.json'; a.click(); }
+        function importData(e) { const r = new FileReader(); r.onload = (f) => { const d = JSON.parse(f.target.result); ranked = d.r || []; backlog = d.b || []; playing = d.p || []; shame = d.s || []; render(); }; r.readAsText(e.target.files[0]); }
+
+        new Sortable(document.getElementById('list-ranked'), { handle: '.drag-handle', animation: 200, onEnd: () => {
+            if(document.getElementById('sort-type').value !== 'manual') return;
+            const order = Array.from(document.getElementById('list-ranked').children).map(li => li.getAttribute('data-id'));
+            ranked = order.map(id => ranked.find(g => g.id === id));
+            render();
+        }});
+        new Sortable(document.getElementById('list-backlog'), { handle: '.drag-handle', animation: 200, onEnd: () => {
+            const order = Array.from(document.getElementById('list-backlog').children).map(li => li.getAttribute('data-id'));
+            backlog = order.map(id => backlog.find(g => g.id === id));
+            render();
+        }});
+        render();
+    </script>
+</body>
+</html>
