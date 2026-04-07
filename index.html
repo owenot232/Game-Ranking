@@ -63,6 +63,7 @@
         button.primary { background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 20px; font-size: 1rem; }
         button.secondary { background: transparent; color: #64748b; border: 1px solid var(--ui); padding: 12px; border-radius: 12px; margin-top: 10px; width: 100%; font-weight: 600; }
         .drop-btn { background: var(--danger) !important; color: white !important; margin-top: 10px !important; }
+        .revive-btn { background: var(--accent) !important; color: #000 !important; margin-top: 10px !important; }
     </style>
 </head>
 <body data-theme="default">
@@ -139,13 +140,14 @@
         <button id="m-start" class="primary" style="background:var(--playing); color:white; display:none;" onclick="moveBacklogToPlaying()">Start Playing 🎮</button>
         <button id="m-finish" class="primary" style="background:var(--backlog); color:white; display:none;" onclick="moveToRanked()">Mark as Finished 🏆</button>
         <button id="m-drop" class="primary drop-btn" style="display:none;" onclick="moveToShame()">Drop Game 🪦</button>
+        <button id="m-revive" class="primary revive-btn" style="display:none;" onclick="reviveFromShame()">Revive Game 🔄</button>
         <button class="secondary" style="color:var(--danger);" onclick="deleteGame()">Delete Forever</button>
         <button class="secondary" onclick="closeModals()">Cancel</button>
     </div>
 
     <div id="modal-shame" class="modal">
         <h2 style="color:var(--shame); text-align:center;">THE HALL OF SHAME</h2>
-        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-bottom:20px;">Games that were too mid to finish.</p>
+        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-bottom:20px;">Games that weren't worth the grind.</p>
         <ul id="list-shame" class="game-list"></ul>
         <div style="flex-grow:1"></div>
         <button class="primary" onclick="closeModals()">Back to Stats</button>
@@ -205,12 +207,12 @@
 
             const bL = document.getElementById('list-backlog'); bL.innerHTML = '';
             backlog.filter(g => g.title.toLowerCase().includes(sBacklog)).forEach((g, i) => {
-                bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">Plan to play...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
+                bL.innerHTML += `<li class="game-item" data-id="${g.id}"><div class="rank">${i+1}</div><div class="game-info" onclick="openReview('${g.id}', 'backlog')"><span class="game-title">${g.title}</span><div class="game-meta">In queue...</div></div><div class="controls"><div class="drag-handle">≡</div></div></li>`;
             });
 
             const shL = document.getElementById('list-shame'); shL.innerHTML = '';
             shame.forEach((g) => {
-                shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Post-Mortem logged ✓</div></div></li>`;
+                shL.innerHTML += `<li class="game-item" style="border-color:var(--shame); opacity:0.7;"><div class="game-info" onclick="openReview('${g.id}', 'shame')"><span class="game-title">${g.title}</span><div class="game-meta">Dropped • Tap to view post-mortem</div></div></li>`;
             });
 
             localStorage.setItem('myGames', JSON.stringify(ranked));
@@ -238,6 +240,7 @@
             document.getElementById('m-finish').style.display = src === 'playing' ? 'block' : 'none';
             document.getElementById('m-start').style.display = src === 'backlog' ? 'block' : 'none';
             document.getElementById('m-drop').style.display = (src === 'backlog' || src === 'playing') ? 'block' : 'none';
+            document.getElementById('m-revive').style.display = src === 'shame' ? 'block' : 'none';
             document.getElementById('m-slider').value = g.rating || 0;
             document.getElementById('m-rating-num').innerText = parseFloat(g.rating || 0).toFixed(1);
             document.getElementById('m-hours').value = g.hours || "";
@@ -249,11 +252,19 @@
 
         function moveBacklogToPlaying() { const idx = backlog.findIndex(x => x.id === editId); const g = backlog.splice(idx, 1)[0]; playing.unshift(g); closeModals(); switchTab('playing', document.querySelectorAll('.nav-item')[2]); }
         function moveToRanked() { const idx = playing.findIndex(x => x.id === editId); const g = playing.splice(idx, 1)[0]; ranked.push(g); closeModals(); switchTab('ranked', document.querySelectorAll('.nav-item')[0]); }
+        
         function moveToShame() { 
             const list = editSource === 'backlog' ? backlog : playing;
             const idx = list.findIndex(x => x.id === editId);
             const g = list.splice(idx, 1)[0];
             shame.push(g); closeModals(); openShame();
+        }
+
+        function reviveFromShame() {
+            const idx = shame.findIndex(x => x.id === editId);
+            const g = shame.splice(idx, 1)[0];
+            backlog.push(g);
+            closeModals(); switchTab('backlog', document.querySelectorAll('.nav-item')[1]);
         }
 
         function saveGame() {
@@ -276,6 +287,7 @@
         function openSettings() { document.getElementById('modal-settings').classList.add('active'); }
         function openShame() { render(); document.getElementById('modal-shame').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+        
         function updateStats() {
             const t = ranked.length; const s = shame.length;
             const avg = t ? (ranked.reduce((s, g) => s + parseFloat(g.rating), 0) / t).toFixed(1) : "0.0";
